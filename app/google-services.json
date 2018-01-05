@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1019849609990",
+    "firebase_url": "https://chat-demo-94f4d.firebaseio.com",
+    "project_id": "chat-demo-94f4d",
+    "storage_bucket": "chat-demo-94f4d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019849609990:android:374b4af11ea6d701",
+        "android_client_info": {
+          "package_name": "com.hieuapp.rivchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1019849609990-5lp6g106bt5gu448515uv3koijn420mr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4xc3dUehMQ7l5YQpnSfXO6Xs1tDdfRwo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
