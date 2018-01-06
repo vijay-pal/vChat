@@ -115,6 +115,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else if (message.type.equalsIgnoreCase(MESSAGE_TYPE_IMAGE) || message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO)) {
             holder.txtContent.setVisibility(View.GONE);
             holder.layoutImage.setVisibility(View.VISIBLE);
+            holder.btnPlayVideo.setVisibility(message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
             holder.imageMessage.setImageBitmap(ImageUtils.getBitmap(message.thumbnail));
             //holder.imageMessage
             holder.progressBar.setVisibility(message.isUploading ? View.VISIBLE : View.GONE);
@@ -181,6 +182,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else if (message.type.equalsIgnoreCase(MESSAGE_TYPE_IMAGE) || message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO)) {
             holder.txtContent.setVisibility(View.GONE);
             holder.layoutImage.setVisibility(View.VISIBLE);
+            holder.btnPlayVideo.setVisibility(message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
             holder.imageMessage.setImageBitmap(ImageUtils.getBitmap(message.thumbnail));
             if (message.downloadUri != null) {
                 try {
@@ -217,7 +219,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             if (file.exists()) {
                                 Intent intent = new Intent(context,
                                         message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? VideoViewActivity.class : ImageViewActivity.class);
-                                intent.putExtra("uri", message.localUri);
+                                intent.putExtra("uri", Uri.fromFile(file).toString());
                                 intent.putExtra("is_local", true);
                                 context.startActivity(intent);
                             }
@@ -248,7 +250,7 @@ class ItemMessageUserHolder extends RecyclerView.ViewHolder {
     final ImageView imageMessage;
     final View layoutImage;
     final ProgressBar progressBar;
-
+    final View btnPlayVideo;
 
     public ItemMessageUserHolder(View itemView) {
         super(itemView);
@@ -257,6 +259,7 @@ class ItemMessageUserHolder extends RecyclerView.ViewHolder {
         avata = (CircleImageView) itemView.findViewById(R.id.imageView2);
         imageMessage = (ImageView) itemView.findViewById(R.id.imageContentUser);
         layoutImage = itemView.findViewById(R.id.layout_image);
+        btnPlayVideo = itemView.findViewById(R.id.btn_play_video);
         progressBar = (ProgressBar) itemView.findViewById(R.id.progress);
     }
 }
@@ -268,6 +271,7 @@ class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
     final View layoutImage;
     final ProgressBar progressBar;
     final ImageView imageMessage;
+    final View btnPlayVideo;
 
     public ItemMessageFriendHolder(View itemView) {
         super(itemView);
@@ -276,6 +280,7 @@ class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
         avata = (CircleImageView) itemView.findViewById(R.id.imageView3);
         imageMessage = (ImageView) itemView.findViewById(R.id.imageContentFriend);
         layoutImage = itemView.findViewById(R.id.layout_image);
+        btnPlayVideo = itemView.findViewById(R.id.btn_play_video);
         progressBar = (ProgressBar) itemView.findViewById(R.id.progress);
     }
 }
