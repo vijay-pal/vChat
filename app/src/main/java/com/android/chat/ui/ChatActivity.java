@@ -26,6 +26,8 @@ import com.android.chat.data.MemberDB;
 import com.android.chat.data.SharedPreferenceHelper;
 import com.android.chat.data.StaticConfig;
 import com.android.chat.data.firebase.GroupMemberValueEventListener;
+import com.android.chat.data.firebase.MessageChildChangeListener;
+import com.android.chat.data.firebase.MessageMemberChangeListener;
 import com.android.chat.model.Conversation;
 import com.android.chat.model.Member;
 import com.android.chat.model.Message;
@@ -53,7 +55,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener, MessageChildChangeListener.MessageChangeListener {
     private static final int PICK_IMAGE_REQUEST = 101;
     private static final int CAMERA_REQUEST = 102;
     private static final int PICK_VIDEO_REQUEST = 103;
@@ -70,7 +72,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private EditText editWriteMessage;
     private LinearLayoutManager linearLayoutManager;
     public static HashMap<String, Bitmap> bitmapAvatarFriend;
-    public Bitmap bitmapAvatarUser;
     private Uri filePath;
 
     //Firebase
@@ -107,13 +108,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_video).setOnClickListener(this);
         findViewById(R.id.btn_location).setOnClickListener(this);
 
-        String base64AvatarUser = SharedPreferenceHelper.getInstance(this).getUserInfo().avatar;
-        if (!base64AvatarUser.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-            byte[] decodedString = Base64.decode(base64AvatarUser, Base64.DEFAULT);
-            bitmapAvatarUser = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        } else {
-            bitmapAvatarUser = null;
-        }
+        String userAvatar = SharedPreferenceHelper.getInstance(this).getUserInfo().avatar;
 
         editWriteMessage = (EditText) findViewById(R.id.editWriteMessage);
         editWriteMessage.setOnClickListener(this);
@@ -125,94 +120,26 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
             recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
             recyclerChat.setLayoutManager(linearLayoutManager);
-            adapter = new ConversationAdapter(this, consersation, bitmapAvatarFriend, bitmapAvatarUser, storage);
+            adapter = new ConversationAdapter(this, consersation, userAvatar, storage);
 
-            FirebaseDatabase.getInstance().getReference().child("group/" + roomId + "/member").addChildEventListener(messageMemberChangeListener);
-            FirebaseDatabase.getInstance().getReference().child("message/" + roomId).addChildEventListener(messageChildChangeListener);
+            FirebaseDatabase.getInstance().getReference().child("group/" + roomId + "/member").addChildEventListener(new MessageMemberChangeListener(this, roomId, members));
+            FirebaseDatabase.getInstance().getReference().child("message/" + roomId).addChildEventListener(new MessageChildChangeListener(this));
             recyclerChat.setAdapter(adapter);
 
             setToolbarTitle(nameFriend);
         }
     }
 
-    private ChildEventListener messageMemberChangeListener = new ChildEventListener() {
-        @Override
-        public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-            Object userId = dataSnapshot.getValue();
-            if (userId != null) {
-                FirebaseDatabase.getInstance().getReference().child("user/" + dataSnapshot.getValue())
-                        .addValueEventListener(
-                                new GroupMemberValueEventListener(ChatActivity.this, userId.toString(), roomId, members));
-            }
+
+    @Override
+    public void onChildAdded(Message message) {
+        if (consersation.getListMessageData().contains(message)) {
+            return;
         }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
-
-    private ChildEventListener messageChildChangeListener = new ChildEventListener() {
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            if (dataSnapshot.getValue() != null) {
-                Log.i("data", "rf::" + dataSnapshot.getRef());
-                HashMap mapMessage = (HashMap) dataSnapshot.getValue();
-                Message newMessage = new Message();
-                newMessage.reference = dataSnapshot.getRef();
-                newMessage.type = (String) mapMessage.get("type");
-                newMessage.thumbnail = (String) mapMessage.get("thumbnail");
-                newMessage.fileName = (String) mapMessage.get("fileName");
-                newMessage.idSender = (String) mapMessage.get("idSender");
-                newMessage.idReceiver = (String) mapMessage.get("idReceiver");
-                newMessage.text = (String) mapMessage.get("text");
-                newMessage.localUri = (String) mapMessage.get("localUri");
-                newMessage.downloadUri = (String) mapMessage.get("downloadUri");
-                newMessage.timestamp = (long) mapMessage.get("timestamp");
-                if (consersation.getListMessageData().contains(newMessage)) {
-                    return;
-                }
-                consersation.getListMessageData().add(newMessage);
-                adapter.notifyDataSetChanged();
-                linearLayoutManager.scrollToPosition(consersation.getListMessageData().size() - 1);
-            }
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
+        consersation.getListMessageData().add(message);
+        adapter.notifyDataSetChanged();
+        linearLayoutManager.scrollToPosition(consersation.getListMessageData().size() - 1);
+    }
 
     private void initToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

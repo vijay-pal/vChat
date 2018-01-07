@@ -2,13 +2,10 @@ package com.android.chat.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,19 +17,16 @@ import com.android.chat.R;
 import com.android.chat.data.StaticConfig;
 import com.android.chat.model.Conversation;
 import com.android.chat.model.Message;
-import com.android.chat.ui.ChatActivity;
 import com.android.chat.ui.ImageViewActivity;
 import com.android.chat.ui.VideoViewActivity;
 import com.android.chat.util.DateUtils;
+import com.android.chat.util.GlideUtils;
 import com.android.chat.util.ImageUtils;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -57,17 +51,14 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private Context context;
     private Conversation consersation;
-    private HashMap<String, Bitmap> bitmapAvata;
     private HashMap<String, DatabaseReference> bitmapAvataDB;
-    private Bitmap bitmapAvataUser;
+    private String userAvatar;
     private FirebaseStorage storage;
 
-    public ConversationAdapter(Context context, Conversation consersation, HashMap<String, Bitmap>
-            bitmapAvata, Bitmap bitmapAvataUser, FirebaseStorage storage) {
+    public ConversationAdapter(Context context, Conversation consersation, String userAvatar, FirebaseStorage storage) {
         this.context = context;
         this.consersation = consersation;
-        this.bitmapAvata = bitmapAvata;
-        this.bitmapAvataUser = bitmapAvataUser;
+        this.userAvatar = userAvatar;
         this.storage = storage;
         bitmapAvataDB = new HashMap<>();
     }
@@ -103,9 +94,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private void bindUserMessage(ItemMessageUserHolder holder, int position) {
         final Message message = consersation.getListMessageData().get(position);
-        if (bitmapAvataUser != null) {
-            holder.avata.setImageBitmap(bitmapAvataUser);
-        }
+        GlideUtils.display(context, userAvatar, holder.avatar, R.drawable.default_avatar);
+
         holder.txtTime.setText(DateUtils.format(message.timestamp, DateUtils.FORMAT_hh_mm_a));
 
         if (TextUtils.isEmpty(message.type) || message.type.equalsIgnoreCase(MESSAGE_TYPE_TEXT)) {
@@ -143,38 +133,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private void bindFriendMessage(final ItemMessageFriendHolder holder, int position) {
         final Message message = consersation.getListMessageData().get(position);
+        GlideUtils.display(context, FirebaseDatabase.getInstance().getReference().child("user/" + message.idSender + "/avatar"),
+                holder.avatar, R.drawable.default_avatar);
 
-        Bitmap currentAvata = bitmapAvata.get(message.idSender);
-        if (currentAvata != null) {
-            holder.avata.setImageBitmap(currentAvata);
-        } else {
-            final String id = message.idSender;
-            if (bitmapAvataDB.get(id) == null) {
-                bitmapAvataDB.put(id, FirebaseDatabase.getInstance().getReference().child("user/" + id + "/avatar"));
-                bitmapAvataDB.get(id).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.getValue() != null) {
-                            String avataStr = (String) dataSnapshot.getValue();
-                            if (!avataStr.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-                                byte[] decodedString = Base64.decode(avataStr, Base64.DEFAULT);
-                                ChatActivity.bitmapAvatarFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-                            } else {
-                                ChatActivity.bitmapAvatarFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avatar));
-                            }
-                            notifyDataSetChanged();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }
-        }
         holder.txtTime.setText(DateUtils.format(message.timestamp, DateUtils.FORMAT_hh_mm_a));
-
         if (TextUtils.isEmpty(message.type) || message.type.equalsIgnoreCase(MESSAGE_TYPE_TEXT)) {
             holder.txtContent.setText(message.text);
             holder.txtContent.setVisibility(View.VISIBLE);
@@ -246,7 +208,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 class ItemMessageUserHolder extends RecyclerView.ViewHolder {
     final TextView txtContent;
     final TextView txtTime;
-    final CircleImageView avata;
+    final CircleImageView avatar;
     final ImageView imageMessage;
     final View layoutImage;
     final ProgressBar progressBar;
@@ -256,7 +218,7 @@ class ItemMessageUserHolder extends RecyclerView.ViewHolder {
         super(itemView);
         txtContent = (TextView) itemView.findViewById(R.id.textContentUser);
         txtTime = (TextView) itemView.findViewById(R.id.textview_time);
-        avata = (CircleImageView) itemView.findViewById(R.id.imageView2);
+        avatar = (CircleImageView) itemView.findViewById(R.id.imageView2);
         imageMessage = (ImageView) itemView.findViewById(R.id.imageContentUser);
         layoutImage = itemView.findViewById(R.id.layout_image);
         btnPlayVideo = itemView.findViewById(R.id.btn_play_video);
@@ -267,7 +229,7 @@ class ItemMessageUserHolder extends RecyclerView.ViewHolder {
 class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
     final TextView txtContent;
     final TextView txtTime;
-    final CircleImageView avata;
+    final CircleImageView avatar;
     final View layoutImage;
     final ProgressBar progressBar;
     final ImageView imageMessage;
@@ -277,7 +239,7 @@ class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
         super(itemView);
         txtContent = (TextView) itemView.findViewById(R.id.textContentFriend);
         txtTime = (TextView) itemView.findViewById(R.id.textview_time);
-        avata = (CircleImageView) itemView.findViewById(R.id.imageView3);
+        avatar = (CircleImageView) itemView.findViewById(R.id.imageView3);
         imageMessage = (ImageView) itemView.findViewById(R.id.imageContentFriend);
         layoutImage = itemView.findViewById(R.id.layout_image);
         btnPlayVideo = itemView.findViewById(R.id.btn_play_video);
