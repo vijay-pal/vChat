@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
@@ -20,9 +22,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.android.chat.R;
+import com.android.chat.data.GroupDB;
 import com.android.chat.data.SharedPreferenceHelper;
 import com.android.chat.data.StaticConfig;
 import com.android.chat.model.Conversation;
+import com.android.chat.model.Group;
 import com.android.chat.model.Message;
 import com.android.chat.ui.adapter.ConversationAdapter;
 import com.android.chat.util.GPSTracker;
@@ -108,7 +112,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         gpsTracker = new GPSTracker(this);
 
         if (idFriend != null && nameFriend != null) {
-            getSupportActionBar().setTitle(nameFriend);
+            initToolBar(nameFriend);
+
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
             recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
             recyclerChat.setLayoutManager(linearLayoutManager);
@@ -162,6 +167,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             });
             recyclerChat.setAdapter(adapter);
         }
+    }
+
+    private void initToolBar(String nameGroup) {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(nameGroup);
+            Group group = GroupDB.getInstance(this).getGroup(roomId);
+            actionBar.setSubtitle(group.member.toString());
+        }
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChatActivity.this, UserProfileFragment.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

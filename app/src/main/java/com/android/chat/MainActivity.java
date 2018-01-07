@@ -56,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Chat Demo");
         }
 
-//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
         floatButton = (FloatingActionButton) findViewById(R.id.fab);
         initFirebase();
         initFragment();
@@ -78,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-                // ...
             }
         };
     }

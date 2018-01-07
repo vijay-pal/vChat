@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -52,7 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class UserProfileFragment extends Fragment {
+public class UserProfileFragment extends AppCompatActivity {
     TextView tvUserName;
     ImageView avatar;
 
@@ -71,15 +72,36 @@ public class UserProfileFragment extends Fragment {
     private DatabaseReference userDB;
     private FirebaseAuth mAuth;
     private User myAccount;
-    private Context context;
-
-    public UserProfileFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_info);
+
+        userDB = FirebaseDatabase.getInstance().getReference().child("user").child(StaticConfig.UID);
+
+        userDB.addListenerForSingleValueEvent(userListener);
+        mAuth = FirebaseAuth.getInstance();
+
+        // Inflate the layout for this fragment
+        avatar = (ImageView) findViewById(R.id.img_avatar);
+        avatar.setOnClickListener(onAvatarClick);
+        tvUserName = (TextView) findViewById(R.id.tv_username);
+
+        SharedPreferenceHelper prefHelper = SharedPreferenceHelper.getInstance(this);
+        myAccount = prefHelper.getUserInfo();
+        setupArrayListInfo(myAccount);
+        setImageAvatar(this, myAccount.avata);
+        tvUserName.setText(myAccount.name);
+
+        recyclerView = (RecyclerView) findViewById(R.id.info_recycler_view);
+        infoAdapter = new UserInfoAdapter(listConfig);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(infoAdapter);
+
+        waitingDialog = new LovelyProgressDialog(this);
     }
 
     private ValueEventListener userListener = new ValueEventListener() {
@@ -90,16 +112,16 @@ public class UserProfileFragment extends Fragment {
             myAccount = dataSnapshot.getValue(User.class);
 
             setupArrayListInfo(myAccount);
-            if(infoAdapter != null){
+            if (infoAdapter != null) {
                 infoAdapter.notifyDataSetChanged();
             }
 
-            if(tvUserName != null){
+            if (tvUserName != null) {
                 tvUserName.setText(myAccount.name);
             }
 
-            setImageAvatar(context, myAccount.avata);
-            SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(context);
+            setImageAvatar(UserProfileFragment.this, myAccount.avata);
+            SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(UserProfileFragment.this);
             preferenceHelper.saveUserInfo(myAccount);
         }
 
@@ -110,37 +132,6 @@ public class UserProfileFragment extends Fragment {
         }
     };
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        userDB = FirebaseDatabase.getInstance().getReference().child("user").child(StaticConfig.UID);
-        userDB.addListenerForSingleValueEvent(userListener);
-        mAuth = FirebaseAuth.getInstance();
-
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_info, container, false);
-        context = view.getContext();
-        avatar = (ImageView) view.findViewById(R.id.img_avatar);
-        avatar.setOnClickListener(onAvatarClick);
-        tvUserName = (TextView)view.findViewById(R.id.tv_username);
-
-        SharedPreferenceHelper prefHelper = SharedPreferenceHelper.getInstance(context);
-        myAccount = prefHelper.getUserInfo();
-        setupArrayListInfo(myAccount);
-        setImageAvatar(context, myAccount.avata);
-        tvUserName.setText(myAccount.name);
-
-        recyclerView = (RecyclerView)view.findViewById(R.id.info_recycler_view);
-        infoAdapter = new UserInfoAdapter(listConfig);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(infoAdapter);
-
-        waitingDialog = new LovelyProgressDialog(context);
-        return view;
-    }
-
     /**
      * Khi click vào avatar thì bắn intent mở trình xem ảnh mặc định để chọn ảnh
      */
@@ -148,7 +139,7 @@ public class UserProfileFragment extends Fragment {
         @Override
         public void onClick(View view) {
 
-            new AlertDialog.Builder(context)
+            new AlertDialog.Builder(UserProfileFragment.this)
                     .setTitle("Avatar")
                     .setMessage("Are you sure want to change avatar profile?")
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -175,11 +166,11 @@ public class UserProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK) {
             if (data == null) {
-                Toast.makeText(context, "Có lỗi xảy ra, vui lòng thử lại", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Có lỗi xảy ra, vui lòng thử lại", Toast.LENGTH_LONG).show();
                 return;
             }
             try {
-                InputStream inputStream = context.getContentResolver().openInputStream(data.getData());
+                InputStream inputStream = getContentResolver().openInputStream(data.getData());
 
                 Bitmap imgBitmap = BitmapFactory.decodeStream(inputStream);
                 imgBitmap = ImageUtils.cropToSquare(imgBitmap);
@@ -200,27 +191,27 @@ public class UserProfileFragment extends Fragment {
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                if(task.isSuccessful()){
+                                if (task.isSuccessful()) {
 
                                     waitingDialog.dismiss();
-                                    SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(context);
+                                    SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(UserProfileFragment.this);
                                     preferenceHelper.saveUserInfo(myAccount);
-                                    avatar.setImageDrawable(ImageUtils.roundedImage(context, liteImage));
+                                    avatar.setImageDrawable(ImageUtils.roundedImage(UserProfileFragment.this, liteImage));
 
-                                    new LovelyInfoDialog(context)
+                                    new LovelyInfoDialog(UserProfileFragment.this)
                                             .setTopColorRes(R.color.colorPrimary)
                                             .setTitle("Success")
                                             .setMessage("Update avatar successfully!")
                                             .show();
                                 }
                             }
-                         })
+                        })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 waitingDialog.dismiss();
                                 Log.d("Update Avatar", "failed");
-                                new LovelyInfoDialog(context)
+                                new LovelyInfoDialog(UserProfileFragment.this)
                                         .setTopColorRes(R.color.colorAccent)
                                         .setTitle("False")
                                         .setMessage("False to update avatar")
@@ -235,9 +226,10 @@ public class UserProfileFragment extends Fragment {
 
     /**
      * Xóa list cũ và cập nhật lại list data mới
+     *
      * @param myAccount
      */
-    public void setupArrayListInfo(User myAccount){
+    public void setupArrayListInfo(User myAccount) {
         listConfig.clear();
         Configuration userNameConfig = new Configuration(USERNAME_LABEL, myAccount.name, R.mipmap.ic_account_box);
         listConfig.add(userNameConfig);
@@ -252,7 +244,7 @@ public class UserProfileFragment extends Fragment {
         listConfig.add(signout);
     }
 
-    private void setImageAvatar(Context context, String imgBase64){
+    private void setImageAvatar(Context context, String imgBase64) {
         try {
             Resources res = getResources();
             //Nếu chưa có avatar thì để hình mặc định
@@ -265,24 +257,19 @@ public class UserProfileFragment extends Fragment {
             }
 
             avatar.setImageDrawable(ImageUtils.roundedImage(context, src));
-        }catch (Exception e){
+        } catch (Exception e) {
         }
     }
 
     @Override
-    public void onDestroyView (){
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDestroy (){
+    public void onDestroy() {
         super.onDestroy();
     }
 
-    public class UserInfoAdapter extends RecyclerView.Adapter<UserInfoAdapter.ViewHolder>{
+    public class UserInfoAdapter extends RecyclerView.Adapter<UserInfoAdapter.ViewHolder> {
         private List<Configuration> profileConfig;
 
-        public UserInfoAdapter(List<Configuration> profileConfig){
+        public UserInfoAdapter(List<Configuration> profileConfig) {
             this.profileConfig = profileConfig;
         }
 
@@ -299,31 +286,31 @@ public class UserProfileFragment extends Fragment {
             holder.label.setText(config.getLabel());
             holder.value.setText(config.getValue());
             holder.icon.setImageResource(config.getIcon());
-            ((RelativeLayout)holder.label.getParent()).setOnClickListener(new View.OnClickListener() {
+            ((RelativeLayout) holder.label.getParent()).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(config.getLabel().equals(SIGNOUT_LABEL)){
+                    if (config.getLabel().equals(SIGNOUT_LABEL)) {
                         FirebaseAuth.getInstance().signOut();
-                        FriendDB.getInstance(getContext()).dropDB();
-                        GroupDB.getInstance(getContext()).dropDB();
-                        ServiceUtils.stopServiceFriendChat(getContext().getApplicationContext(), true);
-                        getActivity().finish();
+                        FriendDB.getInstance(UserProfileFragment.this).dropDB();
+                        GroupDB.getInstance(UserProfileFragment.this).dropDB();
+                        ServiceUtils.stopServiceFriendChat(UserProfileFragment.this.getApplicationContext(), true);
+                        UserProfileFragment.this.finish();
                     }
 
-                    if(config.getLabel().equals(USERNAME_LABEL)){
-                        View vewInflater = LayoutInflater.from(context)
-                                .inflate(R.layout.dialog_edit_username,  (ViewGroup) getView(), false);
-                        final EditText input = (EditText)vewInflater.findViewById(R.id.edit_username);
+                    if (config.getLabel().equals(USERNAME_LABEL)) {
+                        View vewInflater = LayoutInflater.from(UserProfileFragment.this)
+                                .inflate(R.layout.dialog_edit_username, null);
+                        final EditText input = (EditText) vewInflater.findViewById(R.id.edit_username);
                         input.setText(myAccount.name);
                         /*Hiển thị dialog với dEitText cho phép người dùng nhập username mới*/
-                        new AlertDialog.Builder(context)
+                        new AlertDialog.Builder(UserProfileFragment.this)
                                 .setTitle("Edit username")
                                 .setView(vewInflater)
                                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         String newName = input.getText().toString();
-                                        if(!myAccount.name.equals(newName)){
+                                        if (!myAccount.name.equals(newName)) {
                                             changeUserName(newName);
                                         }
                                         dialogInterface.dismiss();
@@ -337,8 +324,8 @@ public class UserProfileFragment extends Fragment {
                                 }).show();
                     }
 
-                    if(config.getLabel().equals(RESETPASS_LABEL)){
-                        new AlertDialog.Builder(context)
+                    if (config.getLabel().equals(RESETPASS_LABEL)) {
+                        new AlertDialog.Builder(UserProfileFragment.this)
                                 .setTitle("Password")
                                 .setMessage("Are you sure want to reset password?")
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -362,12 +349,12 @@ public class UserProfileFragment extends Fragment {
         /**
          * Cập nhật username mới vào SharedPreference và thay đổi trên giao diện
          */
-        private void changeUserName(String newName){
+        private void changeUserName(String newName) {
             userDB.child("name").setValue(newName);
 
 
             myAccount.name = newName;
-            SharedPreferenceHelper prefHelper = SharedPreferenceHelper.getInstance(context);
+            SharedPreferenceHelper prefHelper = SharedPreferenceHelper.getInstance(UserProfileFragment.this);
             prefHelper.saveUserInfo(myAccount);
 
             tvUserName.setText(newName);
@@ -379,7 +366,7 @@ public class UserProfileFragment extends Fragment {
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            new LovelyInfoDialog(context) {
+                            new LovelyInfoDialog(UserProfileFragment.this) {
                                 @Override
                                 public LovelyInfoDialog setConfirmButtonText(String text) {
                                     findView(com.yarolegovich.lovelydialog.R.id.ld_btn_confirm).setOnClickListener(new View.OnClickListener() {
@@ -402,7 +389,7 @@ public class UserProfileFragment extends Fragment {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            new LovelyInfoDialog(context) {
+                            new LovelyInfoDialog(UserProfileFragment.this) {
                                 @Override
                                 public LovelyInfoDialog setConfirmButtonText(String text) {
                                     findView(com.yarolegovich.lovelydialog.R.id.ld_btn_confirm).setOnClickListener(new View.OnClickListener() {
@@ -433,11 +420,12 @@ public class UserProfileFragment extends Fragment {
             // each data item is just a string in this case
             public TextView label, value;
             public ImageView icon;
+
             public ViewHolder(View view) {
                 super(view);
-                label = (TextView)view.findViewById(R.id.tv_title);
-                value = (TextView)view.findViewById(R.id.tv_detail);
-                icon = (ImageView)view.findViewById(R.id.img_icon);
+                label = (TextView) view.findViewById(R.id.tv_title);
+                value = (TextView) view.findViewById(R.id.tv_detail);
+                icon = (ImageView) view.findViewById(R.id.img_icon);
             }
         }
 
