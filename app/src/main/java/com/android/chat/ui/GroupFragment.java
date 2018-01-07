@@ -8,11 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -156,9 +154,9 @@ public class GroupFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                         }
                         listGroup.get(indexGroup).groupInfo.put("name", (String) mapGroupInfo.get("name"));
                         listGroup.get(indexGroup).groupInfo.put("admin", (String) mapGroupInfo.get("admin"));
+                        listGroup.get(indexGroup).groupInfo.put("avatar", (String) mapGroupInfo.get("avatar"));
                     }
                     GroupDB.getInstance(getContext()).addGroup(listGroup.get(indexGroup));
-                    Log.d("GroupFragment", listGroup.get(indexGroup).id + ": " + dataSnapshot.toString());
                     getGroupInfo(indexGroup + 1);
                 }
 
@@ -384,6 +382,8 @@ class ListGroupsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final String groupName = listGroup.get(position).groupInfo.get("name");
+        final String avatar = listGroup.get(position).groupInfo.get("avatar");
+
         if (groupName != null && groupName.length() > 0) {
             ((ItemGroupViewHolder) holder).txtGroupName.setText(groupName);
             ((ItemGroupViewHolder) holder).iconGroup.setText((groupName.charAt(0) + "").toUpperCase());
@@ -404,21 +404,22 @@ class ListGroupsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 Intent intent = new Intent(context, ChatActivity.class);
                 intent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, groupName);
                 ArrayList<CharSequence> idFriend = new ArrayList<>();
-                ChatActivity.bitmapAvataFriend = new HashMap<>();
+                ChatActivity.bitmapAvatarFriend = new HashMap<>();
                 for (String id : listGroup.get(position).member) {
                     idFriend.add(id);
-                    String avata = listFriend.getAvataById(id);
-                    if (!avata.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-                        byte[] decodedString = Base64.decode(avata, Base64.DEFAULT);
-                        ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-                    } else if (avata.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-                        ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
+                    String avatar = listFriend.getAvatarById(id);
+                    if (!avatar.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                        byte[] decodedString = Base64.decode(avatar, Base64.DEFAULT);
+                        ChatActivity.bitmapAvatarFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                    } else if (avatar.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                        ChatActivity.bitmapAvatarFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avatar));
                     } else {
-                        ChatActivity.bitmapAvataFriend.put(id, null);
+                        ChatActivity.bitmapAvatarFriend.put(id, null);
                     }
                 }
                 intent.putCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);
                 intent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, listGroup.get(position).id);
+                intent.putExtra(StaticConfig.INTENT_KEY_CHAT_AVATA, avatar);
                 context.startActivity(intent);
             }
         });

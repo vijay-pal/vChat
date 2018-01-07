@@ -342,7 +342,7 @@ public class LoginActivity extends AppCompatActivity {
                     User userInfo = new User();
                     userInfo.name = (String) hashUser.get("name");
                     userInfo.email = (String) hashUser.get("email");
-                    userInfo.avata = (String) hashUser.get("avata");
+                    userInfo.avatar = (String) hashUser.get("avatar");
                     SharedPreferenceHelper.getInstance(LoginActivity.this).saveUserInfo(userInfo);
                 }
 
@@ -360,7 +360,7 @@ public class LoginActivity extends AppCompatActivity {
             User newUser = new User();
             newUser.email = user.getEmail();
             newUser.name = user.getEmail().substring(0, user.getEmail().indexOf("@"));
-            newUser.avata = StaticConfig.STR_DEFAULT_BASE64;
+            newUser.avatar = StaticConfig.STR_DEFAULT_BASE64;
             FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(newUser);
         }
     }

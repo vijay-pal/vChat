@@ -8,7 +8,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -91,7 +90,7 @@ public class UserProfileFragment extends AppCompatActivity {
         SharedPreferenceHelper prefHelper = SharedPreferenceHelper.getInstance(this);
         myAccount = prefHelper.getUserInfo();
         setupArrayListInfo(myAccount);
-        setImageAvatar(this, myAccount.avata);
+        setImageAvatar(this, myAccount.avatar);
         tvUserName.setText(myAccount.name);
 
         recyclerView = (RecyclerView) findViewById(R.id.info_recycler_view);
@@ -120,7 +119,7 @@ public class UserProfileFragment extends AppCompatActivity {
                 tvUserName.setText(myAccount.name);
             }
 
-            setImageAvatar(UserProfileFragment.this, myAccount.avata);
+            setImageAvatar(UserProfileFragment.this, myAccount.avatar);
             SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(UserProfileFragment.this);
             preferenceHelper.saveUserInfo(myAccount);
         }
@@ -180,14 +179,14 @@ public class UserProfileFragment extends AppCompatActivity {
                         ImageUtils.AVATAR_WIDTH, ImageUtils.AVATAR_HEIGHT);
 
                 String imageBase64 = ImageUtils.encodeBase64(liteImage);
-                myAccount.avata = imageBase64;
+                myAccount.avatar = imageBase64;
 
                 waitingDialog.setCancelable(false)
                         .setTitle("Avatar updating....")
                         .setTopColorRes(R.color.colorPrimary)
                         .show();
 
-                userDB.child("avata").setValue(imageBase64)
+                userDB.child("avatar").setValue(imageBase64)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -250,7 +249,7 @@ public class UserProfileFragment extends AppCompatActivity {
             //Nếu chưa có avatar thì để hình mặc định
             Bitmap src;
             if (imgBase64.equals("default")) {
-                src = BitmapFactory.decodeResource(res, R.drawable.default_avata);
+                src = BitmapFactory.decodeResource(res, R.drawable.default_avatar);
             } else {
                 byte[] decodedString = Base64.decode(imgBase64, Base64.DEFAULT);
                 src = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);

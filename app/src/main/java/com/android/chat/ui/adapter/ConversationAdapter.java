@@ -150,7 +150,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else {
             final String id = message.idSender;
             if (bitmapAvataDB.get(id) == null) {
-                bitmapAvataDB.put(id, FirebaseDatabase.getInstance().getReference().child("user/" + id + "/avata"));
+                bitmapAvataDB.put(id, FirebaseDatabase.getInstance().getReference().child("user/" + id + "/avatar"));
                 bitmapAvataDB.get(id).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -158,9 +158,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             String avataStr = (String) dataSnapshot.getValue();
                             if (!avataStr.equals(StaticConfig.STR_DEFAULT_BASE64)) {
                                 byte[] decodedString = Base64.decode(avataStr, Base64.DEFAULT);
-                                ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                                ChatActivity.bitmapAvatarFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
                             } else {
-                                ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
+                                ChatActivity.bitmapAvatarFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avatar));
                             }
                             notifyDataSetChanged();
                         }

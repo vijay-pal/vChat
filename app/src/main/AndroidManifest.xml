@@ -58,6 +58,11 @@
         <activity
             android:name=".ui.AddGroupActivity"
             android:theme="@style/MyThemeNoActionbar" />
+        <activity
+            android:name=".ui.GroupDetailActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name=".service.FriendChatService"

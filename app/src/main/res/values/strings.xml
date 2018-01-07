@@ -12,6 +12,9 @@
     <string name="next">NEXT</string>
     <string name="register">REGISTER</string>
 
+    <string name="participants">Participants</string>
+    <string name="admin">Admin</string>
+
     <string name="hint_username">Enter a new username</string>
     <string name="hint_email_reset">Enter your email</string>
     <string name="enter_group_name">Enter group name</string>

@@ -13,7 +13,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginEnd="5dp"
-        android:src="@drawable/default_avata" />
+        android:src="@drawable/default_avatar" />
 
     <ImageView
         android:id="@+id/imageContentUser"

@@ -16,8 +16,6 @@ import java.util.Map;
 public class GroupDB {
     private static GroupDB.GroupDBHelper mDbHelper = null;
 
-    // To prevent someone from accidentally instantiating the contract class,
-    // make the constructor private.
     private GroupDB() {
     }
 
@@ -38,17 +36,18 @@ public class GroupDB {
         values.put(FeedEntry.COLUMN_GROUP_ID, group.id);
         values.put(FeedEntry.COLUMN_GROUP_NAME, group.groupInfo.get("name"));
         values.put(FeedEntry.COLUMN_GROUP_ADMIN, group.groupInfo.get("admin"));
+        values.put(FeedEntry.COLUMN_GROUP_AVATAR, group.groupInfo.get("avatar"));
 
-        for (String idMenber : group.member) {
-            values.put(FeedEntry.COLUMN_GROUP_MEMBER, idMenber);
+        for (String idMember : group.member) {
+            values.put(FeedEntry.COLUMN_GROUP_MEMBER, idMember);
             // Insert the new row, returning the primary key value of the new row
             db.insert(FeedEntry.TABLE_NAME, null, values);
         }
     }
 
-    public void deleteGroup(String idGroup){
+    public void deleteGroup(String idGroup) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.delete(FeedEntry.TABLE_NAME, FeedEntry.COLUMN_GROUP_ID + " = " + idGroup , null);
+        db.delete(FeedEntry.TABLE_NAME, FeedEntry.COLUMN_GROUP_ID + " = " + idGroup, null);
     }
 
 
@@ -58,18 +57,20 @@ public class GroupDB {
         }
     }
 
-    public Group getGroup(String id){
+    public Group getGroup(String id) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + GroupDB.FeedEntry.TABLE_NAME + " where " + FeedEntry.COLUMN_GROUP_ID +" = " + id, null);
+        Cursor cursor = db.rawQuery("select * from " + GroupDB.FeedEntry.TABLE_NAME + " where " + FeedEntry.COLUMN_GROUP_ID + " = " + id, null);
         Group newGroup = new Group();
         while (cursor.moveToNext()) {
             String idGroup = cursor.getString(0);
             String nameGroup = cursor.getString(1);
             String admin = cursor.getString(2);
-            String member = cursor.getString(3);
+            String avatar = cursor.getString(3);
+            String member = cursor.getString(4);
             newGroup.id = idGroup;
             newGroup.groupInfo.put("name", nameGroup);
             newGroup.groupInfo.put("admin", admin);
+            newGroup.groupInfo.put("avatar", avatar);
             newGroup.member.add(member);
         }
         return newGroup;
@@ -87,12 +88,14 @@ public class GroupDB {
                 String idGroup = cursor.getString(0);
                 String nameGroup = cursor.getString(1);
                 String admin = cursor.getString(2);
-                String member = cursor.getString(3);
+                String avatar = cursor.getString(3);
+                String member = cursor.getString(4);
                 if (!listKey.contains(idGroup)) {
                     Group newGroup = new Group();
                     newGroup.id = idGroup;
                     newGroup.groupInfo.put("name", nameGroup);
                     newGroup.groupInfo.put("admin", admin);
+                    newGroup.groupInfo.put("avatar", avatar);
                     newGroup.member.add(member);
                     listKey.add(idGroup);
                     mapGroup.put(idGroup, newGroup);
@@ -102,7 +105,7 @@ public class GroupDB {
             }
             cursor.close();
         } catch (Exception e) {
-            return new ArrayList<Group>();
+            return new ArrayList<>();
         }
 
         ArrayList<Group> listGroup = new ArrayList<>();
@@ -124,6 +127,7 @@ public class GroupDB {
         static final String TABLE_NAME = "groups";
         static final String COLUMN_GROUP_ID = "groupID";
         static final String COLUMN_GROUP_NAME = "name";
+        static final String COLUMN_GROUP_AVATAR = "avatar";
         static final String COLUMN_GROUP_ADMIN = "admin";
         static final String COLUMN_GROUP_MEMBER = "memberID";
     }
@@ -135,6 +139,7 @@ public class GroupDB {
                     FeedEntry.COLUMN_GROUP_ID + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_GROUP_NAME + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_GROUP_ADMIN + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_GROUP_AVATAR + TEXT_TYPE + COMMA_SEP +
                     GroupDB.FeedEntry.COLUMN_GROUP_MEMBER + TEXT_TYPE + COMMA_SEP +
                     "PRIMARY KEY (" + GroupDB.FeedEntry.COLUMN_GROUP_ID + COMMA_SEP +
                     GroupDB.FeedEntry.COLUMN_GROUP_MEMBER + "))";

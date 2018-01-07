@@ -22,14 +22,16 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.android.chat.R;
-import com.android.chat.data.GroupDB;
+import com.android.chat.data.MemberDB;
 import com.android.chat.data.SharedPreferenceHelper;
 import com.android.chat.data.StaticConfig;
+import com.android.chat.data.firebase.GroupMemberValueEventListener;
 import com.android.chat.model.Conversation;
-import com.android.chat.model.Group;
+import com.android.chat.model.Member;
 import com.android.chat.model.Message;
 import com.android.chat.ui.adapter.ConversationAdapter;
 import com.android.chat.util.GPSTracker;
+import com.android.chat.util.GlideUtils;
 import com.android.chat.util.ImageUtils;
 import com.android.chat.util.VideoUtils;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -47,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -57,15 +60,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private RecyclerView recyclerChat;
     private ConversationAdapter adapter;
     private String roomId;
+    private String roomAvatar;
     private ArrayList<CharSequence> idFriend;
+    private List<Member> members = new ArrayList<>();
     private Conversation consersation;
     private ImageButton btnSend;
     private ImageButton btnPlus;
     private View layoutBottom;
     private EditText editWriteMessage;
     private LinearLayoutManager linearLayoutManager;
-    public static HashMap<String, Bitmap> bitmapAvataFriend;
-    public Bitmap bitmapAvataUser;
+    public static HashMap<String, Bitmap> bitmapAvatarFriend;
+    public Bitmap bitmapAvatarUser;
     private Uri filePath;
 
     //Firebase
@@ -77,10 +82,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_chat);
+        initToolBar();
+
         Intent intentData = getIntent();
         idFriend = intentData.getCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID);
         roomId = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID);
+        roomAvatar = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_AVATA);
         String nameFriend = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND);
 
         storage = FirebaseStorage.getInstance();
@@ -98,12 +107,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_video).setOnClickListener(this);
         findViewById(R.id.btn_location).setOnClickListener(this);
 
-        String base64AvataUser = SharedPreferenceHelper.getInstance(this).getUserInfo().avata;
-        if (!base64AvataUser.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-            byte[] decodedString = Base64.decode(base64AvataUser, Base64.DEFAULT);
-            bitmapAvataUser = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        String base64AvatarUser = SharedPreferenceHelper.getInstance(this).getUserInfo().avatar;
+        if (!base64AvatarUser.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+            byte[] decodedString = Base64.decode(base64AvatarUser, Base64.DEFAULT);
+            bitmapAvatarUser = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         } else {
-            bitmapAvataUser = null;
+            bitmapAvatarUser = null;
         }
 
         editWriteMessage = (EditText) findViewById(R.id.editWriteMessage);
@@ -112,80 +121,132 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         gpsTracker = new GPSTracker(this);
 
         if (idFriend != null && nameFriend != null) {
-            initToolBar(nameFriend);
 
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
             recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
             recyclerChat.setLayoutManager(linearLayoutManager);
-            adapter = new ConversationAdapter(this, consersation, bitmapAvataFriend, bitmapAvataUser, storage);
+            adapter = new ConversationAdapter(this, consersation, bitmapAvatarFriend, bitmapAvatarUser, storage);
 
-            FirebaseDatabase.getInstance().getReference().child("message/" + roomId).addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    if (dataSnapshot.getValue() != null) {
-                        Log.i("data", "rf::" + dataSnapshot.getRef());
-                        HashMap mapMessage = (HashMap) dataSnapshot.getValue();
-                        Message newMessage = new Message();
-                        newMessage.reference = dataSnapshot.getRef();
-                        newMessage.type = (String) mapMessage.get("type");
-                        newMessage.thumbnail = (String) mapMessage.get("thumbnail");
-                        newMessage.fileName = (String) mapMessage.get("fileName");
-                        newMessage.idSender = (String) mapMessage.get("idSender");
-                        newMessage.idReceiver = (String) mapMessage.get("idReceiver");
-                        newMessage.text = (String) mapMessage.get("text");
-                        newMessage.localUri = (String) mapMessage.get("localUri");
-                        newMessage.downloadUri = (String) mapMessage.get("downloadUri");
-                        newMessage.timestamp = (long) mapMessage.get("timestamp");
-                        if (consersation.getListMessageData().contains(newMessage)) {
-                            return;
-                        }
-                        consersation.getListMessageData().add(newMessage);
-                        adapter.notifyDataSetChanged();
-                        linearLayoutManager.scrollToPosition(consersation.getListMessageData().size() - 1);
-                    }
-                }
-
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            FirebaseDatabase.getInstance().getReference().child("group/" + roomId + "/member").addChildEventListener(messageMemberChangeListener);
+            FirebaseDatabase.getInstance().getReference().child("message/" + roomId).addChildEventListener(messageChildChangeListener);
             recyclerChat.setAdapter(adapter);
+
+            setToolbarTitle(nameFriend);
         }
     }
 
-    private void initToolBar(String nameGroup) {
+    private ChildEventListener messageMemberChangeListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+            Object userId = dataSnapshot.getValue();
+            if (userId != null) {
+                FirebaseDatabase.getInstance().getReference().child("user/" + dataSnapshot.getValue())
+                        .addValueEventListener(
+                                new GroupMemberValueEventListener(ChatActivity.this, userId.toString(), roomId, members));
+            }
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private ChildEventListener messageChildChangeListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            if (dataSnapshot.getValue() != null) {
+                Log.i("data", "rf::" + dataSnapshot.getRef());
+                HashMap mapMessage = (HashMap) dataSnapshot.getValue();
+                Message newMessage = new Message();
+                newMessage.reference = dataSnapshot.getRef();
+                newMessage.type = (String) mapMessage.get("type");
+                newMessage.thumbnail = (String) mapMessage.get("thumbnail");
+                newMessage.fileName = (String) mapMessage.get("fileName");
+                newMessage.idSender = (String) mapMessage.get("idSender");
+                newMessage.idReceiver = (String) mapMessage.get("idReceiver");
+                newMessage.text = (String) mapMessage.get("text");
+                newMessage.localUri = (String) mapMessage.get("localUri");
+                newMessage.downloadUri = (String) mapMessage.get("downloadUri");
+                newMessage.timestamp = (long) mapMessage.get("timestamp");
+                if (consersation.getListMessageData().contains(newMessage)) {
+                    return;
+                }
+                consersation.getListMessageData().add(newMessage);
+                adapter.notifyDataSetChanged();
+                linearLayoutManager.scrollToPosition(consersation.getListMessageData().size() - 1);
+            }
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private void initToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(nameGroup);
-            Group group = GroupDB.getInstance(this).getGroup(roomId);
-            actionBar.setSubtitle(group.member.toString());
-        }
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ChatActivity.this, UserProfileFragment.class);
+                Intent intent = new Intent(ChatActivity.this, GroupDetailActivity.class);
+                intent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, roomId);
                 startActivity(intent);
             }
         });
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    private void setToolbarTitle(String nameGroup) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            if (roomAvatar != null) {
+                GlideUtils.setRoundedDrawable(this, roomAvatar, actionBar);
+            }
+            actionBar.setDisplayUseLogoEnabled(true);
+            actionBar.setTitle(nameGroup);
+            String subTitle = MemberDB.getInstance(this).getMembers(roomId).toString();
+            actionBar.setSubtitle(subTitle.substring(1, subTitle.length() - 1));
+        }
     }
 
     @Override
