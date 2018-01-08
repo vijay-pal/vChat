@@ -1,4 +1,4 @@
-package com.android.chat.ui;
+package com.android.chat.ui.fragments;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.chat.ui.activities.ChatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;

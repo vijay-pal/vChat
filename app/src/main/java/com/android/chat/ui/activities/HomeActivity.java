@@ -1,4 +1,4 @@
-package com.android.chat;
+package com.android.chat.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,11 +12,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.chat.R;
 import com.android.chat.data.StaticConfig;
 import com.android.chat.service.ServiceUtils;
-import com.android.chat.ui.AddGroupActivity;
-import com.android.chat.ui.GroupFragment;
-import com.android.chat.ui.LoginActivity;
+import com.android.chat.ui.fragments.GroupFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 

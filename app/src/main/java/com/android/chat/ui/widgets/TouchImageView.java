@@ -1,4 +1,4 @@
-package com.android.chat;
+package com.android.chat.ui.widgets;
 
 /* * TouchImageView.java
          * By: Michael Ortiz

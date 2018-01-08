@@ -5,7 +5,7 @@
     android:background="@color/grey_100"
     android:orientation="vertical">
 
-    <com.android.chat.TouchImageView
+    <com.android.chat.ui.widgets.TouchImageView
         android:id="@+id/image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -1,18 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        config {
-            keyAlias 'bhrivchat'
-            keyPassword '123456a@'
-            storeFile file('../bhrivchat.jks')
-            storePassword '123456a@'
-        }
-    }
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId 'com.hieuapp.rivchat'
+        applicationId 'com.android.chat'
         minSdkVersion 19
         targetSdkVersion 22
         versionCode 1
@@ -23,10 +15,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
-        }
-        debug {
-            signingConfig signingConfigs.config
         }
     }
     productFlavors {

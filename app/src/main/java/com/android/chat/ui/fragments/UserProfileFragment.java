@@ -1,4 +1,4 @@
-package com.android.chat.ui;
+package com.android.chat.ui.fragments;
 
 import android.app.Activity;
 import android.content.Context;

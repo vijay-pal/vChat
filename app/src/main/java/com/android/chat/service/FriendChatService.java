@@ -21,7 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.android.chat.HomeActivity;
+import com.android.chat.ui.activities.HomeActivity;
 import com.android.chat.R;
 import com.android.chat.data.FriendDB;
 import com.android.chat.data.GroupDB;

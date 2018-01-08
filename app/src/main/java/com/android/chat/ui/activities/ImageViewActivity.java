@@ -1,4 +1,4 @@
-package com.android.chat.ui;
+package com.android.chat.ui.activities;
 
 import android.content.Intent;
 import android.net.Uri;

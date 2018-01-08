@@ -5,14 +5,10 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.chat.R;
@@ -20,8 +16,7 @@ import com.android.chat.data.FriendDB;
 import com.android.chat.data.StaticConfig;
 import com.android.chat.model.Group;
 import com.android.chat.model.ListFriend;
-import com.android.chat.ui.ChatActivity;
-import com.android.chat.ui.GroupFragment;
+import com.android.chat.ui.activities.ChatActivity;
 import com.android.chat.util.GlideUtils;
 
 import java.util.ArrayList;
