@@ -1,4 +1,4 @@
-package com.android.chat.ui.fragments;
+package com.android.chat.ui.activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class UserProfileFragment extends AppCompatActivity {
+public class UserProfileActivity extends AppCompatActivity {
     TextView tvUserName;
     ImageView avatar;
 
@@ -75,7 +75,7 @@ public class UserProfileFragment extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_info);
+        setContentView(R.layout.activity_info);
 
         userDB = FirebaseDatabase.getInstance().getReference().child("user").child(StaticConfig.UID);
 
@@ -106,7 +106,6 @@ public class UserProfileFragment extends AppCompatActivity {
     private ValueEventListener userListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            //Lấy thông tin của user về và cập nhật lên giao diện
             listConfig.clear();
             myAccount = dataSnapshot.getValue(User.class);
 
@@ -119,26 +118,21 @@ public class UserProfileFragment extends AppCompatActivity {
                 tvUserName.setText(myAccount.name);
             }
 
-            setImageAvatar(UserProfileFragment.this, myAccount.avatar);
-            SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(UserProfileFragment.this);
+            setImageAvatar(UserProfileActivity.this, myAccount.avatar);
+            SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(UserProfileActivity.this);
             preferenceHelper.saveUserInfo(myAccount);
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Có lỗi xảy ra, không lấy đc dữ liệu
-            Log.e(UserProfileFragment.class.getName(), "loadPost:onCancelled", databaseError.toException());
         }
     };
 
-    /**
-     * Khi click vào avatar thì bắn intent mở trình xem ảnh mặc định để chọn ảnh
-     */
     private View.OnClickListener onAvatarClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
 
-            new AlertDialog.Builder(UserProfileFragment.this)
+            new AlertDialog.Builder(UserProfileActivity.this)
                     .setTitle("Avatar")
                     .setMessage("Are you sure want to change avatar profile?")
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -193,11 +187,11 @@ public class UserProfileFragment extends AppCompatActivity {
                                 if (task.isSuccessful()) {
 
                                     waitingDialog.dismiss();
-                                    SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(UserProfileFragment.this);
+                                    SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(UserProfileActivity.this);
                                     preferenceHelper.saveUserInfo(myAccount);
-                                    avatar.setImageDrawable(ImageUtils.roundedImage(UserProfileFragment.this, liteImage));
+                                    avatar.setImageDrawable(ImageUtils.roundedImage(UserProfileActivity.this, liteImage));
 
-                                    new LovelyInfoDialog(UserProfileFragment.this)
+                                    new LovelyInfoDialog(UserProfileActivity.this)
                                             .setTopColorRes(R.color.colorPrimary)
                                             .setTitle("Success")
                                             .setMessage("Update avatar successfully!")
@@ -210,7 +204,7 @@ public class UserProfileFragment extends AppCompatActivity {
                             public void onFailure(@NonNull Exception e) {
                                 waitingDialog.dismiss();
                                 Log.d("Update Avatar", "failed");
-                                new LovelyInfoDialog(UserProfileFragment.this)
+                                new LovelyInfoDialog(UserProfileActivity.this)
                                         .setTopColorRes(R.color.colorAccent)
                                         .setTitle("False")
                                         .setMessage("False to update avatar")
@@ -224,22 +218,20 @@ public class UserProfileFragment extends AppCompatActivity {
     }
 
     /**
-     * Xóa list cũ và cập nhật lại list data mới
-     *
      * @param myAccount
      */
     public void setupArrayListInfo(User myAccount) {
         listConfig.clear();
-        Configuration userNameConfig = new Configuration(USERNAME_LABEL, myAccount.name, R.mipmap.ic_account_box);
+        Configuration userNameConfig = new Configuration(USERNAME_LABEL, myAccount.name, R.drawable.ic_account_circle_black_24dp);
         listConfig.add(userNameConfig);
 
-        Configuration emailConfig = new Configuration(EMAIL_LABEL, myAccount.email, R.mipmap.ic_email);
+        Configuration emailConfig = new Configuration(EMAIL_LABEL, myAccount.email, R.drawable.ic_email_black_24dp);
         listConfig.add(emailConfig);
 
-        Configuration resetPass = new Configuration(RESETPASS_LABEL, "", R.mipmap.ic_restore);
+        Configuration resetPass = new Configuration(RESETPASS_LABEL, "", R.drawable.ic_update_black_24dp);
         listConfig.add(resetPass);
 
-        Configuration signout = new Configuration(SIGNOUT_LABEL, "", R.mipmap.ic_power_settings);
+        Configuration signout = new Configuration(SIGNOUT_LABEL, "", R.drawable.ic_power_settings_new_black_24dp);
         listConfig.add(signout);
     }
 
@@ -290,19 +282,19 @@ public class UserProfileFragment extends AppCompatActivity {
                 public void onClick(View view) {
                     if (config.getLabel().equals(SIGNOUT_LABEL)) {
                         FirebaseAuth.getInstance().signOut();
-                        FriendDB.getInstance(UserProfileFragment.this).dropDB();
-                        GroupDB.getInstance(UserProfileFragment.this).dropDB();
-                        ServiceUtils.stopServiceFriendChat(UserProfileFragment.this.getApplicationContext(), true);
-                        UserProfileFragment.this.finish();
+                        FriendDB.getInstance(UserProfileActivity.this).dropDB();
+                        GroupDB.getInstance(UserProfileActivity.this).dropDB();
+                        ServiceUtils.stopServiceFriendChat(UserProfileActivity.this.getApplicationContext(), true);
+                        UserProfileActivity.this.finish();
                     }
 
                     if (config.getLabel().equals(USERNAME_LABEL)) {
-                        View vewInflater = LayoutInflater.from(UserProfileFragment.this)
+                        View vewInflater = LayoutInflater.from(UserProfileActivity.this)
                                 .inflate(R.layout.dialog_edit_username, null);
                         final EditText input = (EditText) vewInflater.findViewById(R.id.edit_username);
                         input.setText(myAccount.name);
                         /*Hiển thị dialog với dEitText cho phép người dùng nhập username mới*/
-                        new AlertDialog.Builder(UserProfileFragment.this)
+                        new AlertDialog.Builder(UserProfileActivity.this)
                                 .setTitle("Edit username")
                                 .setView(vewInflater)
                                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
@@ -324,7 +316,7 @@ public class UserProfileFragment extends AppCompatActivity {
                     }
 
                     if (config.getLabel().equals(RESETPASS_LABEL)) {
-                        new AlertDialog.Builder(UserProfileFragment.this)
+                        new AlertDialog.Builder(UserProfileActivity.this)
                                 .setTitle("Password")
                                 .setMessage("Are you sure want to reset password?")
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -353,7 +345,7 @@ public class UserProfileFragment extends AppCompatActivity {
 
 
             myAccount.name = newName;
-            SharedPreferenceHelper prefHelper = SharedPreferenceHelper.getInstance(UserProfileFragment.this);
+            SharedPreferenceHelper prefHelper = SharedPreferenceHelper.getInstance(UserProfileActivity.this);
             prefHelper.saveUserInfo(myAccount);
 
             tvUserName.setText(newName);
@@ -365,7 +357,7 @@ public class UserProfileFragment extends AppCompatActivity {
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            new LovelyInfoDialog(UserProfileFragment.this) {
+                            new LovelyInfoDialog(UserProfileActivity.this) {
                                 @Override
                                 public LovelyInfoDialog setConfirmButtonText(String text) {
                                     findView(com.yarolegovich.lovelydialog.R.id.ld_btn_confirm).setOnClickListener(new View.OnClickListener() {
@@ -388,7 +380,7 @@ public class UserProfileFragment extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            new LovelyInfoDialog(UserProfileFragment.this) {
+                            new LovelyInfoDialog(UserProfileActivity.this) {
                                 @Override
                                 public LovelyInfoDialog setConfirmButtonText(String text) {
                                     findView(com.yarolegovich.lovelydialog.R.id.ld_btn_confirm).setOnClickListener(new View.OnClickListener() {

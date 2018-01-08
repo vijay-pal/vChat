@@ -52,7 +52,7 @@
             android:parentActivityName=".ui.activities.HomeActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.fragments.UserProfileFragment"
+            android:name=".ui.activities.UserProfileActivity"
             android:parentActivityName=".ui.activities.HomeActivity"
             android:screenOrientation="portrait" />
         <activity
