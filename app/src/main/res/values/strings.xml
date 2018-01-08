@@ -11,7 +11,7 @@
     <string name="repeat_password">Repeat Password</string>
     <string name="next">NEXT</string>
     <string name="register">REGISTER</string>
-
+    <string name="create_group">Create Group</string>
     <string name="participants">Participants</string>
     <string name="admin">Admin</string>
 
@@ -20,4 +20,5 @@
     <string name="enter_group_name">Enter group name</string>
 
     <string name="type_your_message">Type a message</string>
+    <string name="more">More</string>
 </resources>

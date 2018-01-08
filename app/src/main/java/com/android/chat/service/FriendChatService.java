@@ -21,7 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.android.chat.MainActivity;
+import com.android.chat.HomeActivity;
 import com.android.chat.R;
 import com.android.chat.data.FriendDB;
 import com.android.chat.data.GroupDB;
@@ -177,7 +177,7 @@ public class FriendChatService extends Service {
     }
 
     public void createNotify(String name, String content, int id, Bitmap icon, boolean isGroup) {
-        Intent activityIntent = new Intent(this, MainActivity.class);
+        Intent activityIntent = new Intent(this, HomeActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, PendingIntent.FLAG_ONE_SHOT);
         NotificationCompat.Builder notificationBuilder = new
                 NotificationCompat.Builder(this)

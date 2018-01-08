@@ -1,56 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
-    android:layout_marginEnd="10dp"
-    android:layout_marginStart="10dp"
-    android:layout_marginTop="10dp"
-    card_view:cardBackgroundColor="@color/colorCardView"
-    card_view:cardCornerRadius="5dp">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/bt_shape"
+              android:gravity="center"
+              android:orientation="horizontal"
+              android:padding="10dp">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/img_avatar"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@drawable/default_avatar"/>
 
-        <ImageButton
-            android:id="@+id/btnMoreAction"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="5dp"
-            android:layout_marginTop="5dp"
-            android:background="#00000000"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_btn_more" />
-
-        <TextView
-            android:id="@+id/icon_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_margin="5dp"
-            android:background="@drawable/rounded_textview"
-            android:gravity="center"
-            android:text="R"
-            android:textColor="@android:color/white"
-            android:textSize="20sp" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/txtName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/icon_group"
-            android:ellipsize="end"
-            android:lines="1"
-            android:padding="5dp"
-            android:text="Rivchat team"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:gravity="bottom"
+            android:maxLines="1"
+            android:text="Vijay Pal"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="14sp"/>
 
-    </RelativeLayout>
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="12sp"/>
+    </LinearLayout>
 
-</android.support.v7.widget.CardView>
+    <TextView
+        android:id="@+id/txtMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="@string/more"
+        android:textColor="@color/colorPrimary"
+        android:textSize="12sp"
+        android:visibility="gone"/>
+
+</LinearLayout>

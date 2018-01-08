@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
@@ -40,27 +40,27 @@
             android:theme="@style/Translucent" />
         <activity
             android:name=".ui.ChatActivity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.ImageViewActivity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".HomeActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.VideoViewActivity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".HomeActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.UserProfileFragment"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".HomeActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.AddGroupActivity"
             android:theme="@style/MyThemeNoActionbar" />
         <activity
             android:name=".ui.GroupDetailActivity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
