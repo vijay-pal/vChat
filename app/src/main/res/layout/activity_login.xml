@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.CardView
         android:id="@+id/cv"
         android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         app:cardCornerRadius="6dp"
         app:cardElevation="3dp"
@@ -27,7 +27,7 @@
                 android:text="@string/login"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -44,12 +44,13 @@
                     android:paddingBottom="2dp"
                     android:textColor="@color/colorPrimaryDark"
                     android:textCursorDrawable="@drawable/bg_input_cursor"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:textColorHint="#c5c5c5">
 
                 <EditText
@@ -62,43 +63,40 @@
                     android:paddingBottom="10dp"
                     android:textColor="@color/colorPrimaryDark"
                     android:textCursorDrawable="@drawable/bg_input_cursor"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
             </android.support.design.widget.TextInputLayout>
 
             <Button
                 android:id="@+id/bt_go"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/bt_shape"
+                android:layout_marginTop="10dp"
+                android:background="@color/white"
                 android:onClick="clickLogin"
                 android:stateListAnimator="@drawable/state_list_animator_z"
                 android:text="@string/login"
-                android:textColor="@color/colorPrimary"/>
+                android:textColor="@color/colorPrimary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
                 android:onClick="clickResetPassword"
+                android:padding="5dp"
                 android:text="@string/forgot_your_password"
                 android:textColor="#9a9a9a"
-                android:textSize="12sp"/>
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/bt_register"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
-                android:background="@drawable/bt_shape"
+                android:background="@color/white"
                 android:onClick="clickRegisterLayout"
                 android:stateListAnimator="@drawable/state_list_animator_z"
                 android:text="@string/register"
-                android:textColor="@color/colorPrimary"/>
+                android:textColor="@color/colorPrimary" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 

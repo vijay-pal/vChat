@@ -3,7 +3,6 @@ package com.android.chat.data.firebase;
 import android.content.Context;
 
 import com.android.chat.model.Member;
-import com.android.chat.ui.ChatActivity;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
