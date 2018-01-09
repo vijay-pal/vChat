@@ -1,7 +1,6 @@
 package com.android.chat.data;
 
 
-
 public class StaticConfig {
     public static int REQUEST_CODE_REGISTER = 2000;
     public static String STR_EXTRA_ACTION_LOGIN = "login";
@@ -13,10 +12,12 @@ public class StaticConfig {
     public static String UID = "";
     //TODO only use this UID for debug mode
 //    public static String UID = "6kU0SbJPF5QJKZTfvW1BqKolrx22";
-    public static String INTENT_KEY_CHAT_FRIEND = "friendname";
-    public static String INTENT_KEY_CHAT_AVATA = "avatar";
+    public static String INTENT_KEY_CHAT_ROOM = "friendname";
+    public static String INTENT_KEY_CHAT_AVATAR = "avatar";
     public static String INTENT_KEY_CHAT_ID = "friendid";
     public static String INTENT_KEY_CHAT_ROOM_ID = "roomid";
+    public static String INTENT_KEY_CHAT_IS_GROUP = "isgroup";
+
     public static long TIME_TO_REFRESH = 10 * 1000;
     public static long TIME_TO_OFFLINE = 2 * 60 * 1000;
 

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
-import com.android.chat.model.Member;
+import com.android.chat.model.ChatRoom;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,137 +17,132 @@ import java.util.List;
  */
 
 public class ChatRoomDB {
-  private static ChatRoomDB.ChatRoomDBHelper mDbHelper = null;
+    private static ChatRoomDB.ChatRoomDBHelper mDbHelper = null;
 
-  // To prevent someone from accidentally instantiating the contract class,
-  // make the constructor private.
-  private ChatRoomDB() {
-  }
-
-  private static ChatRoomDB instance = null;
-
-  public static ChatRoomDB getInstance(Context context) {
-    if (instance == null) {
-      instance = new ChatRoomDB();
-      mDbHelper = new ChatRoomDB.ChatRoomDBHelper(context);
+    // To prevent someone from accidentally instantiating the contract class,
+    // make the constructor private.
+    private ChatRoomDB() {
     }
-    return instance;
-  }
 
-  public List<Member> getMembers(String groupId) {
-    List<Member> members = new ArrayList<>();
-    SQLiteDatabase db = mDbHelper.getReadableDatabase();
-    Cursor cursor = db.rawQuery(ChatRoomDB.FeedEntry.QUERY_SELECT_ALL_BY_GROUP, new String[]{groupId});
-    if (cursor != null) {
-      if (cursor.getCount() > 0) {
-        Member member;
-        while (cursor.moveToNext()) {
-          member = new Member();
-          member.id = cursor.getString(0);
-          member.groupId = cursor.getString(1);
-          member.name = cursor.getString(2);
-          member.email = cursor.getString(3);
-          member.avatar = cursor.getString(4);
-          members.add(member);
+    private static ChatRoomDB instance = null;
+
+    public static ChatRoomDB getInstance(Context context) {
+        if (instance == null) {
+            instance = new ChatRoomDB();
+            mDbHelper = new ChatRoomDB.ChatRoomDBHelper(context);
         }
-      }
-      if (!cursor.isClosed()) {
-        cursor.close();
-      }
-    }
-    return members;
-  }
-
-  public boolean isMemberExist(String memberId, String groupId) {
-    boolean flag = false;
-    SQLiteDatabase db = mDbHelper.getReadableDatabase();
-    Cursor cursor = db.rawQuery(ChatRoomDB.FeedEntry.QUERY_MEMBER_BY_ID_GROUP_ID, new String[]{memberId, groupId});
-    if (cursor != null) {
-      flag = cursor.getCount() > 0;
-      if (!cursor.isClosed()) {
-        cursor.close();
-      }
-    }
-    return flag;
-  }
-
-  public void addMembers(List<Member> members, String groupId) {
-    for (Member member : members) {
-//      addMember(member, groupId);
-    }
-  }
-
-  public long addChar(Member member, String groupId) {
-    SQLiteDatabase db = mDbHelper.getWritableDatabase();
-    // Create a new map of values, where column names are the keys
-    ContentValues values = new ContentValues();
-    values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_ID, member.id);
-    values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_GROUP_ID, groupId);
-    values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_NAME, member.name);
-    values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_EMAIL, member.email);
-    values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_AVATA, member.avatar);
-    if (isMemberExist(member.id, groupId)) {
-      return db.update(ChatRoomDB.FeedEntry.TABLE_NAME, values, ChatRoomDB.FeedEntry.COLUMN_NAME_ID + "=? AND "
-        + ChatRoomDB.FeedEntry.COLUMN_NAME_GROUP_ID + "=?", new String[]{member.id, groupId});
-    } else {
-      // Insert the new row, returning the primary key value of the new row
-      return db.insert(ChatRoomDB.FeedEntry.TABLE_NAME, null, values);
-    }
-  }
-
-  public static class FeedEntry implements BaseColumns {
-    static final String TABLE_NAME = "member";
-    static final String COLUMN_NAME_ID = "memberId";
-    static final String COLUMN_NAME_GROUP_ID = "groupId";
-    static final String COLUMN_NAME_NAME = "name";
-    static final String COLUMN_NAME_EMAIL = "email";
-    static final String COLUMN_NAME_AVATA = "avatar";
-
-    static final String QUERY_SELECT_ALL_BY_GROUP = "select * from " + TABLE_NAME
-      + " where " + COLUMN_NAME_GROUP_ID + "=?";
-    static final String QUERY_MEMBER_BY_ID_GROUP_ID = "select * from " + TABLE_NAME
-      + " where " + COLUMN_NAME_ID + "=? AND " + COLUMN_NAME_GROUP_ID + "=?";
-  }
-
-  private static final String TEXT_TYPE = " TEXT";
-  private static final String COMMA_SEP = ",";
-
-  private static final String SQL_CREATE_ENTRIES =
-    "CREATE TABLE " + ChatRoomDB.FeedEntry.TABLE_NAME + " (" +
-      ChatRoomDB.FeedEntry.COLUMN_NAME_ID + TEXT_TYPE + COMMA_SEP +
-      ChatRoomDB.FeedEntry.COLUMN_NAME_GROUP_ID + TEXT_TYPE + COMMA_SEP +
-      ChatRoomDB.FeedEntry.COLUMN_NAME_NAME + TEXT_TYPE + COMMA_SEP +
-      ChatRoomDB.FeedEntry.COLUMN_NAME_EMAIL + TEXT_TYPE + COMMA_SEP +
-      ChatRoomDB.FeedEntry.COLUMN_NAME_AVATA + TEXT_TYPE + COMMA_SEP +
-      "PRIMARY KEY (" + ChatRoomDB.FeedEntry.COLUMN_NAME_ID + COMMA_SEP +
-      ChatRoomDB.FeedEntry.COLUMN_NAME_GROUP_ID + ") )";
-
-  private static final String SQL_DELETE_ENTRIES =
-    "DROP TABLE IF EXISTS " + ChatRoomDB.FeedEntry.TABLE_NAME;
-
-
-  private static class ChatRoomDBHelper extends SQLiteOpenHelper {
-    // If you change the database schema, you must increment the database version.
-    static final int DATABASE_VERSION = 1;
-    static final String DATABASE_NAME = "MemberChat.db";
-
-    ChatRoomDBHelper(Context context) {
-      super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        return instance;
     }
 
-    public void onCreate(SQLiteDatabase db) {
-      db.execSQL(SQL_CREATE_ENTRIES);
+    public List<ChatRoom> getChatRooms() {
+        List<ChatRoom> chatRooms = new ArrayList<>();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(ChatRoomDB.FeedEntry.QUERY_SELECT_ALL, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                ChatRoom chatRoom;
+                while (cursor.moveToNext()) {
+                    chatRoom = new ChatRoom();
+                    chatRoom.id = cursor.getString(0);
+                    chatRoom.roomId = cursor.getString(1);
+                    chatRoom.name = cursor.getString(2);
+                    chatRoom.email = cursor.getString(3);
+                    chatRoom.avatar = cursor.getString(4);
+                    chatRoom.isGroup = cursor.getInt(4) == 1;
+                    chatRoom.status = cursor.getString(4);
+                    chatRoom.timestamp = cursor.getLong(4);
+                    chatRooms.add(chatRoom);
+                }
+            }
+            if (!cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return chatRooms;
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-      // This database is only a cache for online data, so its upgrade policy is
-      // to simply to discard the data and start over
-      db.execSQL(SQL_DELETE_ENTRIES);
-      onCreate(db);
+    public void addChatRooms(List<ChatRoom> chatRooms) {
+        for (ChatRoom chatRoom : chatRooms) {
+            addChatRoom(chatRoom);
+        }
     }
 
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-      onUpgrade(db, oldVersion, newVersion);
+    public long addChatRoom(ChatRoom chatRoom) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_ID, chatRoom.id);
+        values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_ROOM_ID, chatRoom.roomId);
+        values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_NAME, chatRoom.name);
+        values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_EMAIL, chatRoom.email);
+        values.put(ChatRoomDB.FeedEntry.COLUMN_NAME_AVATAR, chatRoom.avatar);
+        values.put(FeedEntry.COLUMN_NAME_IS_GROUP, chatRoom.isGroup ? 1 : 0);
+        values.put(FeedEntry.COLUMN_NAME_STATUS, chatRoom.status);
+        values.put(FeedEntry.COLUMN_NAME_TIME_STAMP, chatRoom.timestamp);
+        return db.insert(ChatRoomDB.FeedEntry.TABLE_NAME, null, values);
     }
-  }
+
+    public int deleteAll() {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        return db.delete(FeedEntry.TABLE_NAME, null, null);
+    }
+
+    public static class FeedEntry implements BaseColumns {
+        static final String TABLE_NAME = "chatRoom";
+        static final String COLUMN_NAME_ID = "memberId";
+        static final String COLUMN_NAME_ROOM_ID = "roomId";
+        static final String COLUMN_NAME_NAME = "name";
+        static final String COLUMN_NAME_EMAIL = "email";
+        static final String COLUMN_NAME_AVATAR = "avatar";
+        static final String COLUMN_NAME_IS_GROUP = "isGroup";
+        static final String COLUMN_NAME_STATUS = "status";
+        static final String COLUMN_NAME_TIME_STAMP = "timestamp";
+
+
+        static final String QUERY_SELECT_ALL = "select * from " + TABLE_NAME;
+    }
+
+    private static final String TEXT_TYPE = " TEXT";
+    private static final String COMMA_SEP = ",";
+
+    private static final String SQL_CREATE_ENTRIES =
+            "CREATE TABLE " + ChatRoomDB.FeedEntry.TABLE_NAME + " (" +
+                    ChatRoomDB.FeedEntry.COLUMN_NAME_ID + TEXT_TYPE + COMMA_SEP +
+                    ChatRoomDB.FeedEntry.COLUMN_NAME_ROOM_ID + TEXT_TYPE + COMMA_SEP +
+                    ChatRoomDB.FeedEntry.COLUMN_NAME_NAME + TEXT_TYPE + COMMA_SEP +
+                    ChatRoomDB.FeedEntry.COLUMN_NAME_EMAIL + TEXT_TYPE + COMMA_SEP +
+                    ChatRoomDB.FeedEntry.COLUMN_NAME_AVATAR + TEXT_TYPE + COMMA_SEP +
+                    ChatRoomDB.FeedEntry.COLUMN_NAME_IS_GROUP + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_NAME_STATUS + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_NAME_TIME_STAMP + TEXT_TYPE + COMMA_SEP +
+                    "PRIMARY KEY (" + ChatRoomDB.FeedEntry.COLUMN_NAME_ID + COMMA_SEP +
+                    ChatRoomDB.FeedEntry.COLUMN_NAME_ROOM_ID + ") )";
+
+    private static final String SQL_DELETE_ENTRIES =
+            "DROP TABLE IF EXISTS " + ChatRoomDB.FeedEntry.TABLE_NAME;
+
+
+    private static class ChatRoomDBHelper extends SQLiteOpenHelper {
+        // If you change the database schema, you must increment the database version.
+        static final int DATABASE_VERSION = 1;
+        static final String DATABASE_NAME = "chatRoomChat.db";
+
+        ChatRoomDBHelper(Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
+
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(SQL_CREATE_ENTRIES);
+        }
+
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            // This database is only a cache for online data, so its upgrade policy is
+            // to simply to discard the data and start over
+            db.execSQL(SQL_DELETE_ENTRIES);
+            onCreate(db);
+        }
+
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            onUpgrade(db, oldVersion, newVersion);
+        }
+    }
 }

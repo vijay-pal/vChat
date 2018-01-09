@@ -467,7 +467,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
                         ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
                         Intent intent = new Intent(context, ChatActivity.class);
-                        intent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, name);
+                        intent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM, name);
                         ArrayList<CharSequence> idFriend = new ArrayList<CharSequence>();
                         idFriend.add(id);
                         intent.putCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);

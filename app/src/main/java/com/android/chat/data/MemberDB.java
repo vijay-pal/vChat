@@ -113,12 +113,12 @@ public class MemberDB {
     private static final String COMMA_SEP = ",";
 
     private static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + MemberDB.FeedEntry.TABLE_NAME + " (" +
+            "CREATE TABLE " + FeedEntry.TABLE_NAME + " (" +
                     FeedEntry.COLUMN_NAME_ID + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_NAME_GROUP_ID + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_NAME_NAME + TEXT_TYPE + COMMA_SEP +
-                    MemberDB.FeedEntry.COLUMN_NAME_EMAIL + TEXT_TYPE + COMMA_SEP +
-                    MemberDB.FeedEntry.COLUMN_NAME_AVATA + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_NAME_EMAIL + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_NAME_AVATA + TEXT_TYPE + COMMA_SEP +
                     "PRIMARY KEY (" + FeedEntry.COLUMN_NAME_ID + COMMA_SEP +
                     FeedEntry.COLUMN_NAME_GROUP_ID + ") )";
 
