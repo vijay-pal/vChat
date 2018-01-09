@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.android.chat.R;
 import com.android.chat.data.StaticConfig;
+import com.android.chat.data.firebase.SearchPeopleValueEvent;
 import com.android.chat.model.ChatRoom;
 import com.android.chat.model.Group;
 import com.android.chat.model.ListFriend;
@@ -34,11 +35,13 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
     private List<ChatRoom> originalChatRooms;
     private Context context;
     private Filter mFilter;
+    private SearchPeopleValueEvent.SearchPeopleListener mListener;
 
-    public ChatRoomListAdapter(Context context, List<ChatRoom> originalChatRooms) {
+    public ChatRoomListAdapter(Context context, List<ChatRoom> originalChatRooms, SearchPeopleValueEvent.SearchPeopleListener mListener) {
         this.context = context;
         this.originalChatRooms = originalChatRooms;
-        this.chatRooms.addAll(originalChatRooms);
+        this.chatRooms = originalChatRooms;
+        this.mListener = mListener;
     }
 
     @Override
@@ -69,10 +72,12 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
         });
     }
 
-    public void changeDataSet(List<ChatRoom> chatRooms) {
+    public void changeDataSet(List<ChatRoom> chatRooms, boolean isChange) {
         if (chatRooms != null) {
-            this.chatRooms.clear();
-            this.chatRooms.addAll(chatRooms);
+            this.chatRooms = chatRooms;
+            if (isChange) {
+                this.originalChatRooms = chatRooms;
+            }
             notifyDataSetChanged();
         }
     }
@@ -128,7 +133,10 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             chatRooms.clear();
-            chatRooms.addAll((Collection<? extends ChatRoom>) results.values);
+            chatRooms = (List<ChatRoom>) results.values;
+            if (results.count == 0) {
+                new SearchPeopleValueEvent(mListener, constraint.toString());
+            }
             notifyDataSetChanged();
         }
     }

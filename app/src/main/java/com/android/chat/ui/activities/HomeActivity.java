@@ -21,6 +21,7 @@ import com.android.chat.data.ChatRoomDB;
 import com.android.chat.data.StaticConfig;
 import com.android.chat.data.firebase.ChatRoomValueInitializer;
 import com.android.chat.data.firebase.GroupValueEventListenerImpl;
+import com.android.chat.data.firebase.SearchPeopleValueEvent;
 import com.android.chat.model.ChatRoom;
 import com.android.chat.service.ServiceUtils;
 import com.android.chat.ui.adapter.ChatRoomListAdapter;
@@ -30,7 +31,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements GroupValueEventListenerImpl.GroupRefreshCompletedListener,
-        SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
+        SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchPeopleValueEvent.SearchPeopleListener {
     private static String TAG = "HomeActivity";
 
     private List<ChatRoom> chatRooms;
@@ -93,7 +94,7 @@ public class HomeActivity extends AppCompatActivity implements GroupValueEventLi
         mSwipeRefreshLayout.setOnRefreshListener(this);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerChat);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new ChatRoomListAdapter(this, chatRooms);
+        mAdapter = new ChatRoomListAdapter(this, chatRooms, this);
         recyclerView.setAdapter(mAdapter);
     }
 
@@ -148,7 +149,7 @@ public class HomeActivity extends AppCompatActivity implements GroupValueEventLi
     public void onCompleted(List<ChatRoom> chatRooms) {
         ChatRoomDB.getInstance(this).deleteAll();
         ChatRoomDB.getInstance(this).addChatRooms(chatRooms);
-        mAdapter.changeDataSet(chatRooms);
+        mAdapter.changeDataSet(chatRooms, true);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
@@ -179,5 +180,15 @@ public class HomeActivity extends AppCompatActivity implements GroupValueEventLi
     public boolean onQueryTextChange(String newText) {
         mAdapter.getFilter().filter(newText);
         return true;
+    }
+
+    @Override
+    public void onSearchCompleted(List<ChatRoom> chatRooms) {
+        mAdapter.changeDataSet(chatRooms, false);
+    }
+
+    @Override
+    public void onSearchCancelled() {
+
     }
 }
