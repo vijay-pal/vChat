@@ -15,14 +15,14 @@ import java.util.List;
  * Created by admirar on 1/7/18.
  */
 
-public class GroupMemberValueEventListener implements ValueEventListener {
+public class GroupMemberValueEventListenerImpl implements ValueEventListener {
 
     private Context context;
     private String userId;
     private String roomId;
     private List<Member> members;
 
-    public GroupMemberValueEventListener(Context context, String userId, String roomId, List<Member> members) {
+    public GroupMemberValueEventListenerImpl(Context context, String userId, String roomId, List<Member> members) {
         this.context = context;
         this.userId = userId;
         this.roomId = roomId;

@@ -1,39 +1,43 @@
 package com.android.chat.ui.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.chat.R;
-import com.android.chat.data.FriendDB;
-import com.android.chat.data.StaticConfig;
+import com.android.chat.model.ChatRoom;
 import com.android.chat.model.Group;
 import com.android.chat.model.ListFriend;
-import com.android.chat.ui.activities.ChatActivity;
 import com.android.chat.util.GlideUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by vijay on 8/1/18.
  */
 
-public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.ItemGroupViewHolder> {
+public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapter.ItemGroupViewHolder>
+  implements Filterable {
+  private List<ChatRoom> chatRooms = new ArrayList<>();
+  private List<ChatRoom> originalChatRooms;
   private ArrayList<Group> listGroup;
   public static ListFriend listFriend = null;
   private Context context;
+  private Filter mFilter;
 
-  public GroupListAdapter(Context context, ArrayList<Group> listGroup) {
+  public ChatRoomListAdapter(Context context, List<ChatRoom> originalChatRooms) {
     this.context = context;
-    this.listGroup = listGroup;
+    this.originalChatRooms = originalChatRooms;
+    this.chatRooms.addAll(originalChatRooms);
   }
 
   @Override
@@ -44,7 +48,12 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
 
   @Override
   public void onBindViewHolder(ItemGroupViewHolder holder, final int position) {
-    final String groupName = listGroup.get(position).groupInfo.get("name");
+    ChatRoom chatRoom = chatRooms.get(position);
+    GlideUtils.display(context, chatRoom.avatar, holder.iconGroup, chatRoom.name, R.drawable.default_group_avatar);
+    holder.txtGroupName.setText(chatRoom.name);
+    holder.txtStatus.setVisibility(View.GONE);
+
+    /*final String groupName = listGroup.get(position).groupInfo.get("name");
     final String avatar = listGroup.get(position).groupInfo.get("avatar");
 
     GlideUtils.display(context, avatar, holder.iconGroup, groupName, R.drawable.default_group_avatar);
@@ -78,12 +87,28 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
         intent.putExtra(StaticConfig.INTENT_KEY_CHAT_AVATA, avatar);
         context.startActivity(intent);
       }
-    });
+    });*/
+  }
+
+  public void changeDataSet(List<ChatRoom> chatRooms) {
+    if (chatRooms != null) {
+      this.chatRooms.clear();
+      this.chatRooms.addAll(chatRooms);
+      notifyDataSetChanged();
+    }
   }
 
   @Override
   public int getItemCount() {
-    return listGroup.size();
+    return chatRooms.size();
+  }
+
+  @Override
+  public Filter getFilter() {
+    if (mFilter == null) {
+      mFilter = new FilterImpl();
+    }
+    return mFilter;
   }
 
   class ItemGroupViewHolder extends RecyclerView.ViewHolder {
@@ -91,11 +116,39 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
     final TextView txtGroupName;
     final TextView txtStatus;
 
-    public ItemGroupViewHolder(View itemView) {
+    ItemGroupViewHolder(View itemView) {
       super(itemView);
       iconGroup = (ImageView) itemView.findViewById(R.id.img_avatar);
       txtGroupName = (TextView) itemView.findViewById(R.id.txtName);
       txtStatus = (TextView) itemView.findViewById(R.id.txtStatus);
+    }
+  }
+
+  class FilterImpl extends Filter {
+
+    @Override
+    protected FilterResults performFiltering(CharSequence constraint) {
+      String charString = constraint.toString();
+      FilterResults filterResults = new FilterResults();
+      if (TextUtils.isEmpty(charString)) {
+        filterResults.values = originalChatRooms;
+      } else {
+        List<ChatRoom> chatRooms = new ArrayList<>();
+        for (ChatRoom chatRoom : originalChatRooms) {
+          if (chatRoom.name.equalsIgnoreCase(charString) || chatRoom.email.equalsIgnoreCase(charString)) {
+            chatRooms.add(chatRoom);
+          }
+        }
+        filterResults.values = chatRooms;
+      }
+      return filterResults;
+    }
+
+    @Override
+    protected void publishResults(CharSequence constraint, FilterResults results) {
+      chatRooms.clear();
+      chatRooms.addAll((Collection<? extends ChatRoom>) results.values);
+      notifyDataSetChanged();
     }
   }
 }

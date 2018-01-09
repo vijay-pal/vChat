@@ -13,10 +13,10 @@ import java.util.HashMap;
  * Created by admirar on 1/8/18.
  */
 
-public class MessageChildChangeListener implements ChildEventListener {
+public class MessageChildChangeListenerImpl implements ChildEventListener {
     private MessageChangeListener messageListener;
 
-    public MessageChildChangeListener(MessageChangeListener messageListener) {
+    public MessageChildChangeListenerImpl(MessageChangeListener messageListener) {
         this.messageListener = messageListener;
     }
 
@@ -26,7 +26,6 @@ public class MessageChildChangeListener implements ChildEventListener {
             Log.i("data", "rf::" + dataSnapshot.getRef());
             HashMap mapMessage = (HashMap) dataSnapshot.getValue();
             Message newMessage = new Message();
-            newMessage.reference = dataSnapshot.getRef();
             newMessage.type = (String) mapMessage.get("type");
             newMessage.thumbnail = (String) mapMessage.get("thumbnail");
             newMessage.fileName = (String) mapMessage.get("fileName");

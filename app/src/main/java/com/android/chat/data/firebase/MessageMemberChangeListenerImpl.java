@@ -14,13 +14,13 @@ import java.util.List;
  * Created by admirar on 1/8/18.
  */
 
-public class MessageMemberChangeListener implements ChildEventListener {
+public class MessageMemberChangeListenerImpl implements ChildEventListener {
 
     private Context context;
     private String roomId;
     private List<Member> members;
 
-    public MessageMemberChangeListener(Context context, String roomId, List<Member> members) {
+    public MessageMemberChangeListenerImpl(Context context, String roomId, List<Member> members) {
         this.context = context;
         this.roomId = roomId;
         this.members = members;
@@ -32,7 +32,7 @@ public class MessageMemberChangeListener implements ChildEventListener {
         if (userId != null) {
             FirebaseDatabase.getInstance().getReference().child("user/" + dataSnapshot.getValue())
                     .addValueEventListener(
-                            new GroupMemberValueEventListener(context, userId.toString(), roomId, members));
+                            new GroupMemberValueEventListenerImpl(context, userId.toString(), roomId, members));
         }
     }
 

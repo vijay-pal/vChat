@@ -63,6 +63,12 @@ public class AddGroupActivity extends AppCompatActivity {
     btnAddGroup = (LinearLayout) findViewById(R.id.btnAddGroup);
     editTextGroupName = (EditText) findViewById(R.id.editGroupName);
     txtGroupIcon = (TextView) findViewById(R.id.icon_group);
+
+
+
+
+
+
     dialogWait = new LovelyProgressDialog(this).setCancelable(false);
     editTextGroupName.addTextChangedListener(new TextWatcher() {
       @Override
