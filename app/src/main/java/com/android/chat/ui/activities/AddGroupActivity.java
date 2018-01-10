@@ -1,5 +1,6 @@
 package com.android.chat.ui.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,8 +28,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
-import com.yarolegovich.lovelydialog.LovelyInfoDialog;
-import com.yarolegovich.lovelydialog.LovelyProgressDialog;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,7 +43,7 @@ public class AddGroupActivity extends AppCompatActivity {
   private Set<String> listIDRemove;
   private EditText editTextGroupName;
   private TextView txtGroupIcon, txtActionName;
-  private LovelyProgressDialog dialogWait;
+  private ProgressDialog dialogWait;
   private boolean isEditGroup;
   private Group groupEdit;
 
@@ -65,11 +64,8 @@ public class AddGroupActivity extends AppCompatActivity {
     txtGroupIcon = (TextView) findViewById(R.id.icon_group);
 
 
-
-
-
-
-    dialogWait = new LovelyProgressDialog(this).setCancelable(false);
+    dialogWait = new ProgressDialog(this);
+    dialogWait.setCancelable(false);
     editTextGroupName.addTextChangedListener(new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -131,10 +127,9 @@ public class AddGroupActivity extends AppCompatActivity {
 
   private void editGroup() {
     //Show dialog wait
-    dialogWait.setIcon(R.drawable.ic_add_group_dialog)
-      .setTitle("Editing....")
-      .setTopColorRes(R.color.colorPrimary)
-      .show();
+    dialogWait.setIcon(R.drawable.ic_add_group_dialog);
+    dialogWait.setTitle("Editing....");
+    dialogWait.show();
     //Delete group
     final String idGroup = groupEdit.id;
     Room room = new Room();
@@ -154,25 +149,7 @@ public class AddGroupActivity extends AppCompatActivity {
         @Override
         public void onFailure(@NonNull Exception e) {
           dialogWait.dismiss();
-          new LovelyInfoDialog(AddGroupActivity.this) {
-            @Override
-            public LovelyInfoDialog setConfirmButtonText(String text) {
-              findView(com.yarolegovich.lovelydialog.R.id.ld_btn_confirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                  dismiss();
-                }
-              });
-              return super.setConfirmButtonText(text);
-            }
-          }
-            .setTopColorRes(R.color.colorAccent)
-            .setIcon(R.drawable.ic_add_group_dialog)
-            .setTitle("False")
-            .setMessage("Cannot connect database")
-            .setCancelable(false)
-            .setConfirmButtonText("Ok")
-            .show();
+          Toast.makeText(AddGroupActivity.this, "Cannot connect database", Toast.LENGTH_LONG).show();
         }
       })
     ;
@@ -180,10 +157,9 @@ public class AddGroupActivity extends AppCompatActivity {
 
   private void createGroup() {
     //Show dialog wait
-    dialogWait.setIcon(R.drawable.ic_add_group_dialog)
-      .setTitle("Registering....")
-      .setTopColorRes(R.color.colorPrimary)
-      .show();
+    dialogWait.setIcon(R.drawable.ic_add_group_dialog);
+    dialogWait.setTitle("Registering....");
+    dialogWait.show();
 
     final String idGroup = (StaticConfig.UID + System.currentTimeMillis()).hashCode() + "";
     Room room = new Room();
@@ -218,25 +194,7 @@ public class AddGroupActivity extends AppCompatActivity {
           @Override
           public void onFailure(@NonNull Exception e) {
             dialogWait.dismiss();
-            new LovelyInfoDialog(AddGroupActivity.this) {
-              @Override
-              public LovelyInfoDialog setConfirmButtonText(String text) {
-                findView(com.yarolegovich.lovelydialog.R.id.ld_btn_confirm).setOnClickListener(new View.OnClickListener() {
-                  @Override
-                  public void onClick(View view) {
-                    dismiss();
-                  }
-                });
-                return super.setConfirmButtonText(text);
-              }
-            }
-              .setTopColorRes(R.color.colorAccent)
-              .setIcon(R.drawable.ic_add_group_dialog)
-              .setTitle("False")
-              .setMessage("Cannot connect database")
-              .setCancelable(false)
-              .setConfirmButtonText("Ok")
-              .show();
+            Toast.makeText(AddGroupActivity.this, "Cannot connect database", Toast.LENGTH_LONG).show();
           }
         });
     }
@@ -262,25 +220,7 @@ public class AddGroupActivity extends AppCompatActivity {
         @Override
         public void onFailure(@NonNull Exception e) {
           dialogWait.dismiss();
-          new LovelyInfoDialog(AddGroupActivity.this) {
-            @Override
-            public LovelyInfoDialog setConfirmButtonText(String text) {
-              findView(com.yarolegovich.lovelydialog.R.id.ld_btn_confirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                  dismiss();
-                }
-              });
-              return super.setConfirmButtonText(text);
-            }
-          }
-            .setTopColorRes(R.color.colorAccent)
-            .setIcon(R.drawable.ic_add_group_dialog)
-            .setTitle("False")
-            .setMessage("Create group false")
-            .setCancelable(false)
-            .setConfirmButtonText("Ok")
-            .show();
+          Toast.makeText(AddGroupActivity.this, "Create group false", Toast.LENGTH_LONG).show();
         }
       });
     }

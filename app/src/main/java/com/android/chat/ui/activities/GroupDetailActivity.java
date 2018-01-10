@@ -2,7 +2,6 @@ package com.android.chat.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
@@ -12,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.android.chat.R;
 import com.android.chat.data.GroupDB;
@@ -21,16 +19,6 @@ import com.android.chat.data.StaticConfig;
 import com.android.chat.model.Group;
 import com.android.chat.ui.adapter.GroupMemberAdapter;
 import com.android.chat.util.GlideUtils;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.yarolegovich.lovelydialog.LovelyInfoDialog;
-
-import java.util.ArrayList;
 
 /**
  * Created by admirar on 1/7/18.

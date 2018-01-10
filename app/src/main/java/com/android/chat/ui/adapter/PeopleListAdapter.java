@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,7 +18,6 @@ import com.android.chat.util.GlideUtils;
 
 import java.util.Set;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by vijay on 8/1/18.
@@ -88,14 +88,14 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.It
 
   class ItemFriendHolder extends RecyclerView.ViewHolder {
     public TextView txtName, txtEmail;
-    public CircleImageView avatar;
+    public ImageView avatar;
     public CheckBox checkBox;
 
     public ItemFriendHolder(View itemView) {
       super(itemView);
       txtName = (TextView) itemView.findViewById(R.id.txtName);
       txtEmail = (TextView) itemView.findViewById(R.id.txtEmail);
-      avatar = (CircleImageView) itemView.findViewById(R.id.icon_avata);
+      avatar = (ImageView) itemView.findViewById(R.id.icon_avata);
       checkBox = (CheckBox) itemView.findViewById(R.id.checkAddPeople);
     }
   }

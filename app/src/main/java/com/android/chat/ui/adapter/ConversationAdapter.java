@@ -34,215 +34,213 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.util.HashMap;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 /**
  * Created by admirar on 12/19/17.
  */
 
 public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public static final String MESSAGE_TYPE_TEXT = "text";
-    public static final String MESSAGE_TYPE_IMAGE = "image";
-    public static final String MESSAGE_TYPE_VIDEO = "video";
+  public static final String MESSAGE_TYPE_TEXT = "text";
+  public static final String MESSAGE_TYPE_IMAGE = "image";
+  public static final String MESSAGE_TYPE_VIDEO = "video";
 
-    static final int VIEW_TYPE_USER_MESSAGE = 0;
-    static final int VIEW_TYPE_FRIEND_MESSAGE = 1;
+  static final int VIEW_TYPE_USER_MESSAGE = 0;
+  static final int VIEW_TYPE_FRIEND_MESSAGE = 1;
 
-    private Context context;
-    private Conversation consersation;
-    private HashMap<String, DatabaseReference> bitmapAvataDB;
-    private String userAvatar;
-    private FirebaseStorage storage;
+  private Context context;
+  private Conversation consersation;
+  private HashMap<String, DatabaseReference> bitmapAvataDB;
+  private String userAvatar;
+  private FirebaseStorage storage;
 
-    public ConversationAdapter(Context context, Conversation consersation, String userAvatar, FirebaseStorage storage) {
-        this.context = context;
-        this.consersation = consersation;
-        this.userAvatar = userAvatar;
-        this.storage = storage;
-        bitmapAvataDB = new HashMap<>();
+  public ConversationAdapter(Context context, Conversation consersation, String userAvatar, FirebaseStorage storage) {
+    this.context = context;
+    this.consersation = consersation;
+    this.userAvatar = userAvatar;
+    this.storage = storage;
+    bitmapAvataDB = new HashMap<>();
+  }
+
+  public void addItem(Message message) {
+    consersation.getListMessageData().add(message);
+    notifyDataSetChanged();
+  }
+
+  @Override
+  public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    if (viewType == VIEW_TYPE_FRIEND_MESSAGE) {
+      View view = LayoutInflater.from(context).inflate(R.layout.rc_item_message_friend, parent, false);
+      return new ItemMessageFriendHolder(view);
+    } else if (viewType == VIEW_TYPE_USER_MESSAGE) {
+      View view = LayoutInflater.from(context).inflate(R.layout.rc_item_message_user, parent, false);
+      return new ItemMessageUserHolder(view);
     }
+    return null;
+  }
 
-    public void addItem(Message message) {
-        consersation.getListMessageData().add(message);
-        notifyDataSetChanged();
+  @Override
+  public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    switch (holder.getItemViewType()) {
+      case VIEW_TYPE_USER_MESSAGE:
+        bindUserMessage((ItemMessageUserHolder) holder, position);
+        break;
+      case VIEW_TYPE_FRIEND_MESSAGE:
+        bindFriendMessage((ItemMessageFriendHolder) holder, position);
+        break;
     }
+  }
 
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == VIEW_TYPE_FRIEND_MESSAGE) {
-            View view = LayoutInflater.from(context).inflate(R.layout.rc_item_message_friend, parent, false);
-            return new ItemMessageFriendHolder(view);
-        } else if (viewType == VIEW_TYPE_USER_MESSAGE) {
-            View view = LayoutInflater.from(context).inflate(R.layout.rc_item_message_user, parent, false);
-            return new ItemMessageUserHolder(view);
+  private void bindUserMessage(ItemMessageUserHolder holder, int position) {
+    final Message message = consersation.getListMessageData().get(position);
+    GlideUtils.display(context, userAvatar, holder.avatar, R.drawable.default_avatar);
+
+    holder.txtTime.setText(DateUtils.format(message.timestamp, DateUtils.FORMAT_hh_mm_a));
+
+    if (TextUtils.isEmpty(message.type) || message.type.equalsIgnoreCase(MESSAGE_TYPE_TEXT)) {
+      holder.txtContent.setText(message.text);
+      holder.txtContent.setVisibility(View.VISIBLE);
+      holder.layoutImage.setVisibility(View.GONE);
+    } else if (message.type.equalsIgnoreCase(MESSAGE_TYPE_IMAGE) || message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO)) {
+      holder.txtContent.setVisibility(View.GONE);
+      holder.layoutImage.setVisibility(View.VISIBLE);
+      holder.btnPlayVideo.setVisibility(message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
+      holder.imageMessage.setImageBitmap(ImageUtils.getBitmap(message.thumbnail));
+      //holder.imageMessage
+      holder.progressBar.setVisibility(message.isUploading ? View.VISIBLE : View.GONE);
+
+      Glide.with(context)
+        .load(message.localUri)
+        .into(holder.imageMessage);
+
+      holder.imageMessage.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          if (message.localUri.startsWith("https://maps.googleapis.com/maps/api/staticmap")) {
+            return;
+          }
+          Intent intent = new Intent(context,
+            message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? VideoViewActivity.class : ImageViewActivity.class);
+          intent.putExtra("uri", message.localUri);
+          intent.putExtra("is_local", true);
+          context.startActivity(intent);
         }
-        return null;
+      });
     }
 
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        switch (holder.getItemViewType()) {
-            case VIEW_TYPE_USER_MESSAGE:
-                bindUserMessage((ItemMessageUserHolder) holder, position);
-                break;
-            case VIEW_TYPE_FRIEND_MESSAGE:
-                bindFriendMessage((ItemMessageFriendHolder) holder, position);
-                break;
-        }
-    }
+  }
 
-    private void bindUserMessage(ItemMessageUserHolder holder, int position) {
-        final Message message = consersation.getListMessageData().get(position);
-        GlideUtils.display(context, userAvatar, holder.avatar, R.drawable.default_avatar);
+  private void bindFriendMessage(final ItemMessageFriendHolder holder, int position) {
+    final Message message = consersation.getListMessageData().get(position);
+    GlideUtils.display(context, FirebaseDatabase.getInstance().getReference().child("user/" + message.idSender + "/avatar"),
+      holder.avatar, R.drawable.default_avatar);
 
-        holder.txtTime.setText(DateUtils.format(message.timestamp, DateUtils.FORMAT_hh_mm_a));
-
-        if (TextUtils.isEmpty(message.type) || message.type.equalsIgnoreCase(MESSAGE_TYPE_TEXT)) {
-            holder.txtContent.setText(message.text);
-            holder.txtContent.setVisibility(View.VISIBLE);
-            holder.layoutImage.setVisibility(View.GONE);
-        } else if (message.type.equalsIgnoreCase(MESSAGE_TYPE_IMAGE) || message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO)) {
-            holder.txtContent.setVisibility(View.GONE);
-            holder.layoutImage.setVisibility(View.VISIBLE);
-            holder.btnPlayVideo.setVisibility(message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
-            holder.imageMessage.setImageBitmap(ImageUtils.getBitmap(message.thumbnail));
-            //holder.imageMessage
-            holder.progressBar.setVisibility(message.isUploading ? View.VISIBLE : View.GONE);
-
+    holder.txtTime.setText(DateUtils.format(message.timestamp, DateUtils.FORMAT_hh_mm_a));
+    if (TextUtils.isEmpty(message.type) || message.type.equalsIgnoreCase(MESSAGE_TYPE_TEXT)) {
+      holder.txtContent.setText(message.text);
+      holder.txtContent.setVisibility(View.VISIBLE);
+      holder.layoutImage.setVisibility(View.GONE);
+    } else if (message.type.equalsIgnoreCase(MESSAGE_TYPE_IMAGE) || message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO)) {
+      holder.txtContent.setVisibility(View.GONE);
+      holder.layoutImage.setVisibility(View.VISIBLE);
+      holder.btnPlayVideo.setVisibility(message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
+      holder.imageMessage.setImageBitmap(ImageUtils.getBitmap(message.thumbnail));
+      if (message.downloadUri != null) {
+        try {
+          final StorageReference httpsReference = storage.getReferenceFromUrl(message.downloadUri);
+          final File file = new File(ImageUtils.getChatFolder(message.type.equalsIgnoreCase(MESSAGE_TYPE_IMAGE) ? "images" : "videos")
+            + File.separator + message.fileName);
+          if (file.exists()) {
             Glide.with(context)
-                    .load(message.localUri)
-                    .into(holder.imageMessage);
-
-            holder.imageMessage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (message.localUri.startsWith("https://maps.googleapis.com/maps/api/staticmap")) {
-                        return;
-                    }
-                    Intent intent = new Intent(context,
-                            message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? VideoViewActivity.class : ImageViewActivity.class);
-                    intent.putExtra("uri", message.localUri);
-                    intent.putExtra("is_local", true);
-                    context.startActivity(intent);
-                }
+              .load(Uri.fromFile(file))
+              .into(holder.imageMessage);
+          } else if (message.localUri.startsWith("https://maps.googleapis.com/maps/api/staticmap")) {
+            Glide.with(context)
+              .load(message.localUri)
+              .into(holder.imageMessage);
+          } else if (!message.isUploading) {
+            message.isUploading = true;
+            httpsReference.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+              @Override
+              public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                message.isUploading = false;
+                notifyDataSetChanged();
+              }
+            }).addOnFailureListener(new OnFailureListener() {
+              @Override
+              public void onFailure(@NonNull Exception exception) {
+                message.isUploading = false;
+              }
             });
-        }
-
-    }
-
-    private void bindFriendMessage(final ItemMessageFriendHolder holder, int position) {
-        final Message message = consersation.getListMessageData().get(position);
-        GlideUtils.display(context, FirebaseDatabase.getInstance().getReference().child("user/" + message.idSender + "/avatar"),
-                holder.avatar, R.drawable.default_avatar);
-
-        holder.txtTime.setText(DateUtils.format(message.timestamp, DateUtils.FORMAT_hh_mm_a));
-        if (TextUtils.isEmpty(message.type) || message.type.equalsIgnoreCase(MESSAGE_TYPE_TEXT)) {
-            holder.txtContent.setText(message.text);
-            holder.txtContent.setVisibility(View.VISIBLE);
-            holder.layoutImage.setVisibility(View.GONE);
-        } else if (message.type.equalsIgnoreCase(MESSAGE_TYPE_IMAGE) || message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO)) {
-            holder.txtContent.setVisibility(View.GONE);
-            holder.layoutImage.setVisibility(View.VISIBLE);
-            holder.btnPlayVideo.setVisibility(message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
-            holder.imageMessage.setImageBitmap(ImageUtils.getBitmap(message.thumbnail));
-            if (message.downloadUri != null) {
-                try {
-                    final StorageReference httpsReference = storage.getReferenceFromUrl(message.downloadUri);
-                    final File file = new File(ImageUtils.getChatFolder(message.type.equalsIgnoreCase(MESSAGE_TYPE_IMAGE) ? "images" : "videos")
-                            + File.separator + message.fileName);
-                    if (file.exists()) {
-                        Glide.with(context)
-                                .load(Uri.fromFile(file))
-                                .into(holder.imageMessage);
-                    } else if (message.localUri.startsWith("https://maps.googleapis.com/maps/api/staticmap")) {
-                        Glide.with(context)
-                                .load(message.localUri)
-                                .into(holder.imageMessage);
-                    } else if (!message.isUploading) {
-                        message.isUploading = true;
-                        httpsReference.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                message.isUploading = false;
-                                notifyDataSetChanged();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                message.isUploading = false;
-                            }
-                        });
-                        notifyDataSetChanged();
-                    }
-                    holder.imageMessage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (file.exists()) {
-                                Intent intent = new Intent(context,
-                                        message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? VideoViewActivity.class : ImageViewActivity.class);
-                                intent.putExtra("uri", Uri.fromFile(file).toString());
-                                intent.putExtra("is_local", true);
-                                context.startActivity(intent);
-                            }
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            notifyDataSetChanged();
+          }
+          holder.imageMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              if (file.exists()) {
+                Intent intent = new Intent(context,
+                  message.type.equalsIgnoreCase(MESSAGE_TYPE_VIDEO) ? VideoViewActivity.class : ImageViewActivity.class);
+                intent.putExtra("uri", Uri.fromFile(file).toString());
+                intent.putExtra("is_local", true);
+                context.startActivity(intent);
+              }
             }
+          });
+        } catch (Exception e) {
+          e.printStackTrace();
         }
+      }
     }
+  }
 
-    @Override
-    public int getItemViewType(int position) {
-        return consersation.getListMessageData().get(position).idSender.equals(StaticConfig.UID) ? VIEW_TYPE_USER_MESSAGE : VIEW_TYPE_FRIEND_MESSAGE;
-    }
+  @Override
+  public int getItemViewType(int position) {
+    return consersation.getListMessageData().get(position).idSender.equals(StaticConfig.UID) ? VIEW_TYPE_USER_MESSAGE : VIEW_TYPE_FRIEND_MESSAGE;
+  }
 
-    @Override
-    public int getItemCount() {
-        return consersation.getListMessageData().size();
-    }
+  @Override
+  public int getItemCount() {
+    return consersation.getListMessageData().size();
+  }
 }
 
 class ItemMessageUserHolder extends RecyclerView.ViewHolder {
-    final TextView txtContent;
-    final TextView txtTime;
-    final CircleImageView avatar;
-    final ImageView imageMessage;
-    final View layoutImage;
-    final ProgressBar progressBar;
-    final View btnPlayVideo;
+  final TextView txtContent;
+  final TextView txtTime;
+  final ImageView avatar;
+  final ImageView imageMessage;
+  final View layoutImage;
+  final ProgressBar progressBar;
+  final View btnPlayVideo;
 
-    public ItemMessageUserHolder(View itemView) {
-        super(itemView);
-        txtContent = (TextView) itemView.findViewById(R.id.textContentUser);
-        txtTime = (TextView) itemView.findViewById(R.id.textview_time);
-        avatar = (CircleImageView) itemView.findViewById(R.id.imageView2);
-        imageMessage = (ImageView) itemView.findViewById(R.id.imageContentUser);
-        layoutImage = itemView.findViewById(R.id.layout_image);
-        btnPlayVideo = itemView.findViewById(R.id.btn_play_video);
-        progressBar = (ProgressBar) itemView.findViewById(R.id.progress);
-    }
+  public ItemMessageUserHolder(View itemView) {
+    super(itemView);
+    txtContent = (TextView) itemView.findViewById(R.id.textContentUser);
+    txtTime = (TextView) itemView.findViewById(R.id.textview_time);
+    avatar = (ImageView) itemView.findViewById(R.id.imageView2);
+    imageMessage = (ImageView) itemView.findViewById(R.id.imageContentUser);
+    layoutImage = itemView.findViewById(R.id.layout_image);
+    btnPlayVideo = itemView.findViewById(R.id.btn_play_video);
+    progressBar = (ProgressBar) itemView.findViewById(R.id.progress);
+  }
 }
 
 class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
-    final TextView txtContent;
-    final TextView txtTime;
-    final CircleImageView avatar;
-    final View layoutImage;
-    final ProgressBar progressBar;
-    final ImageView imageMessage;
-    final View btnPlayVideo;
+  final TextView txtContent;
+  final TextView txtTime;
+  final ImageView avatar;
+  final View layoutImage;
+  final ProgressBar progressBar;
+  final ImageView imageMessage;
+  final View btnPlayVideo;
 
-    public ItemMessageFriendHolder(View itemView) {
-        super(itemView);
-        txtContent = (TextView) itemView.findViewById(R.id.textContentFriend);
-        txtTime = (TextView) itemView.findViewById(R.id.textview_time);
-        avatar = (CircleImageView) itemView.findViewById(R.id.imageView3);
-        imageMessage = (ImageView) itemView.findViewById(R.id.imageContentFriend);
-        layoutImage = itemView.findViewById(R.id.layout_image);
-        btnPlayVideo = itemView.findViewById(R.id.btn_play_video);
-        progressBar = (ProgressBar) itemView.findViewById(R.id.progress);
-    }
+  public ItemMessageFriendHolder(View itemView) {
+    super(itemView);
+    txtContent = (TextView) itemView.findViewById(R.id.textContentFriend);
+    txtTime = (TextView) itemView.findViewById(R.id.textview_time);
+    avatar = (ImageView) itemView.findViewById(R.id.imageView3);
+    imageMessage = (ImageView) itemView.findViewById(R.id.imageContentFriend);
+    layoutImage = itemView.findViewById(R.id.layout_image);
+    btnPlayVideo = itemView.findViewById(R.id.btn_play_video);
+    progressBar = (ProgressBar) itemView.findViewById(R.id.progress);
+  }
 }
