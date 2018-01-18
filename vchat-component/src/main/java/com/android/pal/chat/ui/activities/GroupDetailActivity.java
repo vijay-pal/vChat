@@ -63,10 +63,10 @@ public class GroupDetailActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout =  findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(group.groupInfo.get("name"));
 
-        ImageView imageView = (ImageView) findViewById(R.id.image_view);
+        ImageView imageView = findViewById(R.id.image_view);
         GlideUtils.display(this, group.groupInfo.get("avatar"), imageView, R.drawable.default_group_avatar);
 
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.collapsedappbar);

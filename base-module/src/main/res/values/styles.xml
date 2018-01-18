@@ -1,20 +1,11 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Base.vChatTheme">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">#03A9F4</item>
-        <item name="colorPrimaryDark">#0288D1</item>
-        <item name="colorAccent">#4fa881</item>
-        <!-- set Can use Activity transitions -->
-    </style>
-
-    <style name="AppTheme.NoActionBar" parent="AppTheme">
+    <style name="AppTheme.NoActionBar" parent="Base.vChatTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="MyThemeNoActionbar" parent="AppTheme">
+    <style name="MyThemeNoActionbar" parent="Base.vChatTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

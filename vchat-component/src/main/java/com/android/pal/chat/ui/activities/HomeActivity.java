@@ -31,164 +31,176 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements GroupValueEventListenerImpl.GroupRefreshCompletedListener,
-        SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchPeopleValueEvent.SearchPeopleListener {
-    private static String TAG = "HomeActivity";
+  SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchPeopleValueEvent.SearchPeopleListener {
+  private static String TAG = "HomeActivity";
 
-    private List<ChatRoom> chatRooms;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private FirebaseUser user;
+  private List<ChatRoom> chatRooms;
+  private FirebaseAuth mAuth;
+  private FirebaseAuth.AuthStateListener mAuthListener;
+  private FirebaseUser user;
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ChatRoomListAdapter mAdapter;
+  private SwipeRefreshLayout mSwipeRefreshLayout;
+  private ChatRoomListAdapter mAdapter;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        initToolBar();
-        initComponent();
-        initFirebase();
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    initToolBar();
+    initComponent();
+    initFirebase();
+  }
+
+  private void initToolBar() {
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setTitle("vChat");
+      actionBar.setDisplayHomeAsUpEnabled(true);
     }
+    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        finish();
+      }
+    });
 
-    private void initToolBar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle("vChat");
-            actionBar.setDisplayHomeAsUpEnabled(true);
+  }
+
+  private void initFirebase() {
+    mAuth = FirebaseAuth.getInstance();
+    mAuthListener = new FirebaseAuth.AuthStateListener() {
+      @Override
+      public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+          StaticConfig.UID = user.getUid();
+          if (chatRooms.isEmpty()) {
+            onRefresh();
+          }
+        } else {
+          HomeActivity.this.finish();
         }
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+      }
+    };
+  }
 
+  private void initComponent() {
+    chatRooms = ChatRoomDB.getInstance(HomeActivity.this).getChatRooms();
+    mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+    mSwipeRefreshLayout.setOnRefreshListener(this);
+    RecyclerView recyclerView = findViewById(R.id.recyclerChat);
+    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    mAdapter = new ChatRoomListAdapter(this, chatRooms, this);
+    recyclerView.setAdapter(mAdapter);
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mAuth.addAuthStateListener(mAuthListener);
+    ServiceUtils.stopServiceFriendChat(getApplicationContext(), false);
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    if (mAuthListener != null) {
+      mAuth.removeAuthStateListener(mAuthListener);
+    }
+  }
+
+  @Override
+  protected void onDestroy() {
+    ServiceUtils.startServiceFriendChat(getApplicationContext());
+    super.onDestroy();
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.menu_main, menu);
+
+    if (!StaticConfig.IS_ENABLE_SEARCH_OPTION) {
+      menu.findItem(R.id.actionSearch).setVisible(false);
+    } else {
+      SearchView searchView = (SearchView) menu.findItem(R.id.actionSearch).getActionView();
+      searchView.setOnQueryTextListener(this);
+    }
+    if (!StaticConfig.IS_ENABLE_ABOUT_OPTION) {
+      menu.findItem(R.id.actionAbout).setVisible(false);
+    }
+    if (!StaticConfig.IS_ENABLE_CREATE_GROUP) {
+      menu.findItem(R.id.actionCreateGroup).setVisible(false);
+    }
+    if (!StaticConfig.IS_ENABLE_MY_PROFILE) {
+      menu.findItem(R.id.actionSettings).setVisible(false);
+    }
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    int id = item.getItemId();
+
+    if (id == R.id.actionAbout) {
+      Toast.makeText(this, "vChat version " + BuildConfig.VERSION_NAME, Toast.LENGTH_LONG).show();
+      return true;
+    } else if (id == R.id.actionCreateGroup) {
+      startActivity(new Intent(this, AddGroupActivity.class));
+      return true;
+    } else if (id == R.id.actionSettings) {
+      startActivity(new Intent(this, UserProfileActivity.class));
+      return true;
     }
 
-    private void initFirebase() {
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    StaticConfig.UID = user.getUid();
-                    if (chatRooms.isEmpty()) {
-                        onRefresh();
-                    }
-                } else {
-                    HomeActivity.this.finish();
-                    // User is signed in
-//                    startActivity(new Intent(HomeActivity.this, LoginActivity.class));
-                }
-            }
-        };
+    return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onCompleted(List<ChatRoom> chatRooms) {
+    ChatRoomDB.getInstance(this).deleteAll();
+    ChatRoomDB.getInstance(this).addChatRooms(chatRooms);
+    mAdapter.changeDataSet(chatRooms, true);
+    mSwipeRefreshLayout.setRefreshing(false);
+  }
+
+  @Override
+  public void onCancelled() {
+    mSwipeRefreshLayout.setRefreshing(false);
+  }
+
+  @Override
+  public void fetchFriend() {
+
+  }
+
+  @Override
+  public void onRefresh() {
+    if (ServiceUtils.isNetworkConnected(this)) {
+      mSwipeRefreshLayout.setRefreshing(true);
+      new ChatRoomValueInitializer(HomeActivity.this, HomeActivity.this);
     }
+  }
 
-    private void initComponent() {
-        chatRooms = ChatRoomDB.getInstance(HomeActivity.this).getChatRooms();
-        mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-        RecyclerView recyclerView = findViewById(R.id.recyclerChat);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new ChatRoomListAdapter(this, chatRooms, this);
-        recyclerView.setAdapter(mAdapter);
-    }
+  @Override
+  public boolean onQueryTextSubmit(String query) {
+    return false;
+  }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-        ServiceUtils.stopServiceFriendChat(getApplicationContext(), false);
-    }
+  @Override
+  public boolean onQueryTextChange(String newText) {
+    mAdapter.getFilter().filter(newText);
+    return true;
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
+  @Override
+  public void onSearchCompleted(List<ChatRoom> chatRooms) {
+    mAdapter.changeDataSet(chatRooms, false);
+  }
 
-    @Override
-    protected void onDestroy() {
-        ServiceUtils.startServiceFriendChat(getApplicationContext());
-        super.onDestroy();
-    }
+  @Override
+  public void onSearchCancelled() {
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        SearchView searchView = (SearchView) menu.findItem(R.id.actionSearch).getActionView();
-        searchView.setOnQueryTextListener(this);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.actionAbout) {
-            Toast.makeText(this, "vChat version " + BuildConfig.VERSION_NAME, Toast.LENGTH_LONG).show();
-            return true;
-        } else if (id == R.id.actionCreateGroup) {
-            startActivity(new Intent(this, AddGroupActivity.class));
-            return true;
-        } else if (id == R.id.actionSettings) {
-            startActivity(new Intent(this, UserProfileActivity.class));
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onCompleted(List<ChatRoom> chatRooms) {
-        ChatRoomDB.getInstance(this).deleteAll();
-        ChatRoomDB.getInstance(this).addChatRooms(chatRooms);
-        mAdapter.changeDataSet(chatRooms, true);
-        mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void onCancelled() {
-        mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void fetchFriend() {
-
-    }
-
-    @Override
-    public void onRefresh() {
-        if (ServiceUtils.isNetworkConnected(this)) {
-            mSwipeRefreshLayout.setRefreshing(true);
-            new ChatRoomValueInitializer(HomeActivity.this, HomeActivity.this);
-        }
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        mAdapter.getFilter().filter(newText);
-        return true;
-    }
-
-    @Override
-    public void onSearchCompleted(List<ChatRoom> chatRooms) {
-        mAdapter.changeDataSet(chatRooms, false);
-    }
-
-    @Override
-    public void onSearchCancelled() {
-
-    }
+  }
 }

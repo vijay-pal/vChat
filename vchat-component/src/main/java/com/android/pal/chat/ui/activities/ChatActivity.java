@@ -92,8 +92,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         storageReference = storage.getReference();
 
         consersation = new Conversation();
-        btnSend = (ImageButton) findViewById(R.id.btnSend);
-        btnPlus = (ImageButton) findViewById(R.id.btnPlus);
+        btnSend = findViewById(R.id.btnSend);
+        btnPlus = findViewById(R.id.btnPlus);
         layoutBottom = findViewById(R.id.bottom_layout);
 
         btnSend.setOnClickListener(this);
@@ -139,7 +139,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initToolBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         toolbar.setOnClickListener(new View.OnClickListener() {
