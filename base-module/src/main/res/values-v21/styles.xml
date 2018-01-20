@@ -11,6 +11,16 @@
         <item name="android:statusBarColor">#0288D1</item>
     </style>
 
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorPrimary">#03A9F4</item>
+        <item name="colorPrimaryDark">#0288D1</item>
+        <item name="colorAccent">#4fa881</item>
+        <item name="android:colorPrimary">#03A9F4</item>
+        <item name="android:colorPrimaryDark">#0288D1</item>
+        <item name="android:colorAccent">#4fa881</item>
+        <item name="android:statusBarColor">#0288D1</item>
+    </style>
+
     <style name="AppTheme.NoActionBar" parent="Base.vChatTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

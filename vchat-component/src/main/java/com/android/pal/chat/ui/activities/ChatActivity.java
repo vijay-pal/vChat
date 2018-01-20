@@ -266,6 +266,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             uploadImage(ConversationAdapter.MESSAGE_TYPE_IMAGE);
         } else if (requestCode == PICK_VIDEO_REQUEST && data != null && data.getData() != null) {
             filePath = data.getData();
+
             uploadImage(ConversationAdapter.MESSAGE_TYPE_VIDEO);
         }
     }
