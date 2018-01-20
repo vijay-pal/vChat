@@ -25,7 +25,7 @@ public class ImageViewActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_view);
-        ImageView imageView = (ImageView) findViewById(R.id.image_view);
+        ImageView imageView =  findViewById(R.id.image_view);
         storage = FirebaseStorage.getInstance();
         Intent intent = getIntent();
         if (intent != null) {
