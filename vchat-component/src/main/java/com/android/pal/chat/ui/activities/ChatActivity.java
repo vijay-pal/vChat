@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.android.pal.chat.R;
 import com.android.pal.chat.base.StaticConfig;
@@ -266,7 +267,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             uploadImage(ConversationAdapter.MESSAGE_TYPE_IMAGE);
         } else if (requestCode == PICK_VIDEO_REQUEST && data != null && data.getData() != null) {
             filePath = data.getData();
-
+            File f = new File(filePath.getPath());
+            long size = f.length();
+            if (size > 1024 * 1024 * 5) {
+                Toast.makeText(this, "File size must be less than 5MB", Toast.LENGTH_LONG).show();
+                return;
+            }
             uploadImage(ConversationAdapter.MESSAGE_TYPE_VIDEO);
         }
     }
