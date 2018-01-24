@@ -45,7 +45,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_group_detail);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.info_recycler_view);
+        RecyclerView recyclerView =  findViewById(R.id.info_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Group group = GroupDB.getInstance(this).getGroup(groupId);
