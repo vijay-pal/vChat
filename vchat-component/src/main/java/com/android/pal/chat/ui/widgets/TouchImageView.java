@@ -757,7 +757,7 @@ public class TouchImageView extends ImageView {
     }
 
     /**
-     * Gesture Listener detects a single click or long click and passes that on
+     * Gesture TaskListener detects a single click or long click and passes that on
      * to the view's listener.
      *
      * @author Ortiz
@@ -1167,7 +1167,7 @@ public class TouchImageView extends ImageView {
 
             //
             // OnTouchImageViewListener is set: TouchImageView listener has been flung by user.
-            // Listener runnable updated with each frame of fling animation.
+            // TaskListener runnable updated with each frame of fling animation.
             //
             if (touchImageViewListener != null) {
                 touchImageViewListener.onMove();

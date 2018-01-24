@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="60dp"
-              android:gravity="center"
-              android:orientation="horizontal">
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:gravity="center"
+    android:orientation="horizontal">
 
-    <ImageView
+    <com.android.pal.chat.ui.widgets.CircularImageView
         android:id="@+id/icon_avata"
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_weight="2"
-        android:src="@drawable/default_avatar"/>
+        android:src="@drawable/default_avatar" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -26,7 +26,7 @@
             android:layout_weight="1"
             android:gravity="bottom"
             android:text="Nguyen Binh"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
             android:id="@+id/txtEmail"
@@ -35,13 +35,13 @@
             android:layout_weight="1"
             android:gravity="top"
             android:text="Nguyen Binh"
-            android:textAppearance="?android:attr/textAppearanceSmall"/>
+            android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
 
     <CheckBox
         android:id="@+id/checkAddPeople"
         android:layout_width="0dp"
         android:layout_height="20dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
 </LinearLayout>

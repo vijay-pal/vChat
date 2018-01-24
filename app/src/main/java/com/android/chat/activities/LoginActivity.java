@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.regex.Matcher;
 
-public class LoginActivity extends AppCompatActivity implements LoginAuth.Listener {
+public class LoginActivity extends AppCompatActivity implements LoginAuth.TaskListener {
   private static String TAG = "LoginActivity";
   private EditText editTextUsername, editTextPassword;
   private ProgressDialog waitingDialog;

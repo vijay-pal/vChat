@@ -2,7 +2,6 @@ package com.android.pal.chat.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,21 +22,19 @@ import com.android.pal.chat.data.firebase.ChatRoomValueInitializer;
 import com.android.pal.chat.data.firebase.GroupValueEventListenerImpl;
 import com.android.pal.chat.data.firebase.SearchPeopleValueEvent;
 import com.android.pal.chat.model.ChatRoom;
+import com.android.pal.chat.service.LoginAuth;
 import com.android.pal.chat.service.ServiceUtils;
 import com.android.pal.chat.ui.adapter.ChatRoomListAdapter;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements GroupValueEventListenerImpl.GroupRefreshCompletedListener,
-  SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchPeopleValueEvent.SearchPeopleListener {
-  private static String TAG = "HomeActivity";
+    SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchPeopleValueEvent.SearchPeopleListener,
+    LoginAuth.UserSessionListener {
 
   private List<ChatRoom> chatRooms;
-  private FirebaseAuth mAuth;
-  private FirebaseAuth.AuthStateListener mAuthListener;
-  private FirebaseUser user;
+  private LoginAuth loginAuth;
 
   private SwipeRefreshLayout mSwipeRefreshLayout;
   private ChatRoomListAdapter mAdapter;
@@ -69,21 +66,7 @@ public class HomeActivity extends AppCompatActivity implements GroupValueEventLi
   }
 
   private void initFirebase() {
-    mAuth = FirebaseAuth.getInstance();
-    mAuthListener = new FirebaseAuth.AuthStateListener() {
-      @Override
-      public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        user = firebaseAuth.getCurrentUser();
-        if (user != null) {
-          StaticConfig.UID = user.getUid();
-          if (chatRooms.isEmpty()) {
-            onRefresh();
-          }
-        } else {
-          HomeActivity.this.finish();
-        }
-      }
-    };
+    loginAuth = new LoginAuth(this, this);
   }
 
   private void initComponent() {
@@ -99,15 +82,15 @@ public class HomeActivity extends AppCompatActivity implements GroupValueEventLi
   @Override
   protected void onStart() {
     super.onStart();
-    mAuth.addAuthStateListener(mAuthListener);
+    loginAuth.addAuthStateListener();
     ServiceUtils.stopServiceFriendChat(getApplicationContext(), false);
   }
 
   @Override
   protected void onStop() {
     super.onStop();
-    if (mAuthListener != null) {
-      mAuth.removeAuthStateListener(mAuthListener);
+    if (loginAuth != null) {
+      loginAuth.removeAuthStateListener();
     }
   }
 
@@ -202,5 +185,18 @@ public class HomeActivity extends AppCompatActivity implements GroupValueEventLi
   @Override
   public void onSearchCancelled() {
 
+  }
+
+  @Override
+  public void result(FirebaseUser user) {
+    StaticConfig.UID = user.getUid();
+    if (chatRooms.isEmpty()) {
+      onRefresh();
+    }
+  }
+
+  @Override
+  public void sessionExpired() {
+    finish();
   }
 }

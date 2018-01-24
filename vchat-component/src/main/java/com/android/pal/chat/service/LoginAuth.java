@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.android.pal.chat.base.StaticConfig;
-import com.android.pal.chat.base.VChatSeetings;
 import com.android.pal.chat.base.data.SharedPreferenceHelper;
 import com.android.pal.chat.base.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,18 +25,23 @@ import java.util.HashMap;
  */
 
 public class LoginAuth {
-  private Listener mListener;
+  private TaskListener mTaskListener;
+  private UserSessionListener mSessionListener;
   private AuthUtils authUtils;
   private FirebaseAuth mAuth;
   private FirebaseUser user;
   private FirebaseAuth.AuthStateListener mAuthListener;
-  private boolean firstTimeAccess;
   private Context mContext;
 
-  public LoginAuth(Context mContext, Listener mListener) {
+  public LoginAuth(Context mContext, TaskListener mTaskListener) {
     this.mContext = mContext;
-    this.mListener = mListener;
-    firstTimeAccess = true;
+    this.mTaskListener = mTaskListener;
+    initFirebase();
+  }
+
+  public LoginAuth(Context mContext, UserSessionListener mTaskListener) {
+    this.mContext = mContext;
+    this.mSessionListener = mTaskListener;
     initFirebase();
   }
 
@@ -65,8 +69,15 @@ public class LoginAuth {
         if (user != null) {
           // User is signed in
           StaticConfig.UID = user.getUid();
-          if (mListener != null) {
-            mListener.result(user);
+          if (mTaskListener != null) {
+            mTaskListener.result(user);
+          }
+          if (mSessionListener != null) {
+            mSessionListener.result(user);
+          }
+        } else {
+          if (mSessionListener != null) {
+            mSessionListener.sessionExpired();
           }
         }
 
@@ -76,89 +87,89 @@ public class LoginAuth {
 
   public class AuthUtils {
     public void createUser(String email, String password) {
-      if (mListener != null) {
-        mListener.startProgress();
+      if (mTaskListener != null) {
+        mTaskListener.startProgress();
       }
       mAuth.createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-          @Override
-          public void onComplete(@NonNull Task<AuthResult> task) {
-            if (mListener != null) {
-              mListener.dismissProgress();
+          .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+              if (mTaskListener != null) {
+                mTaskListener.dismissProgress();
+              }
+              // signed in user can be handled in the listener.
+              if (!task.isSuccessful()) {
+                Toast.makeText(mContext, "Email exist or weak password!", Toast.LENGTH_LONG).show();
+              } else {
+                initNewUserInfo();
+                mTaskListener.userCreated();
+              }
             }
-            // signed in user can be handled in the listener.
-            if (!task.isSuccessful()) {
-              Toast.makeText(mContext, "Email exist or weak password!", Toast.LENGTH_LONG).show();
-            } else {
-              initNewUserInfo();
-              mListener.userCreated();
+          })
+          .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+              if (mTaskListener != null) {
+                mTaskListener.dismissProgress();
+              }
             }
-          }
-        })
-        .addOnFailureListener(new OnFailureListener() {
-          @Override
-          public void onFailure(@NonNull Exception e) {
-            if (mListener != null) {
-              mListener.dismissProgress();
-            }
-          }
-        })
+          })
       ;
     }
 
     public void signIn(String email, String password) {
-      if (mListener != null) {
-        mListener.startProgress();
+      if (mTaskListener != null) {
+        mTaskListener.startProgress();
       }
       mAuth.signInWithEmailAndPassword(email, password)
-        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-          @Override
-          public void onComplete(@NonNull Task<AuthResult> task) {
-            if (mListener != null) {
-              mListener.dismissProgress();
-            }
-            if (!task.isSuccessful()) {
-              Toast.makeText(mContext, "Email not exist or wrong password!", Toast.LENGTH_LONG).show();
-            } else {
-              saveUserInfo();
-              if (mListener != null) {
-                mListener.loginSuccess();
+          .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+              if (mTaskListener != null) {
+                mTaskListener.dismissProgress();
+              }
+              if (!task.isSuccessful()) {
+                Toast.makeText(mContext, "Email not exist or wrong password!", Toast.LENGTH_LONG).show();
+              } else {
+                saveUserInfo();
+                if (mTaskListener != null) {
+                  mTaskListener.loginSuccess();
+                }
               }
             }
-          }
-        })
-        .addOnFailureListener(new OnFailureListener() {
-          @Override
-          public void onFailure(@NonNull Exception e) {
-            if (mListener != null) {
-              mListener.dismissProgress();
+          })
+          .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+              if (mTaskListener != null) {
+                mTaskListener.dismissProgress();
+              }
             }
-          }
-        });
+          });
     }
 
     public void resetPassword(final String email) {
       mAuth.sendPasswordResetEmail(email)
-        .addOnCompleteListener(new OnCompleteListener<Void>() {
-          @Override
-          public void onComplete(@NonNull Task<Void> task) {
-            Toast.makeText(mContext, "Sent email to " + email, Toast.LENGTH_LONG).show();
-          }
-        })
-        .addOnFailureListener(new OnFailureListener() {
-          @Override
-          public void onFailure(@NonNull Exception e) {
-            Toast.makeText(mContext, "We can't sent recovery email on  " + email, Toast.LENGTH_LONG).show();
-          }
-        });
+          .addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+              Toast.makeText(mContext, "Sent email to " + email, Toast.LENGTH_LONG).show();
+            }
+          })
+          .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+              Toast.makeText(mContext, "We can't sent recovery email on  " + email, Toast.LENGTH_LONG).show();
+            }
+          });
     }
 
     public void saveUserInfo() {
       FirebaseDatabase.getInstance().getReference().child("user/" + StaticConfig.UID).addListenerForSingleValueEvent(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-          if (mListener != null) {
-            mListener.dismissProgress();
+          if (mTaskListener != null) {
+            mTaskListener.dismissProgress();
           }
           HashMap hashUser = (HashMap) dataSnapshot.getValue();
           User userInfo = new User();
@@ -184,7 +195,7 @@ public class LoginAuth {
     }
   }
 
-  public interface Listener {
+  public interface TaskListener {
     void startProgress();
 
     void dismissProgress();
@@ -194,5 +205,12 @@ public class LoginAuth {
     void userCreated();
 
     void loginSuccess();
+  }
+
+  public interface UserSessionListener {
+
+    void result(FirebaseUser user);
+
+    void sessionExpired();
   }
 }
