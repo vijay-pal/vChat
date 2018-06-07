@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:text="@string/participants"
-        android:textColor="@color/colorPrimary"
+        android:textColor="#114739"
         android:textSize="20sp" />
 
     <android.support.v7.widget.RecyclerView

@@ -1,6 +1,5 @@
 package com.android.pal.chat.ui.adapter;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -9,20 +8,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import com.android.pal.chat.R;
+import com.android.pal.chat.base.BaseActivity;
 import com.android.pal.chat.base.StaticConfig;
 import com.android.pal.chat.data.firebase.AddFriendChatRoom;
+import com.android.pal.chat.data.firebase.GroupMessage;
 import com.android.pal.chat.data.firebase.SearchPeopleValueEvent;
 import com.android.pal.chat.model.ChatRoom;
 import com.android.pal.chat.ui.activities.ChatActivity;
+import com.android.pal.chat.ui.activities.ConversationActivity;
 import com.android.pal.chat.util.GlideUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by vijay on 8/1/18.
@@ -32,15 +34,17 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
   implements Filterable, AddFriendChatRoom.FriendAddedListener {
   private List<ChatRoom> chatRooms = new ArrayList<>();
   private List<ChatRoom> originalChatRooms;
-  private Context context;
+  private BaseActivity context;
   private Filter mFilter;
   private SearchPeopleValueEvent.SearchPeopleListener mListener;
+  private GroupMessage groupMessage;
 
-  public ChatRoomListAdapter(Context context, List<ChatRoom> originalChatRooms, SearchPeopleValueEvent.SearchPeopleListener mListener) {
+  public ChatRoomListAdapter(BaseActivity context, List<ChatRoom> originalChatRooms, SearchPeopleValueEvent.SearchPeopleListener mListener) {
     this.context = context;
     this.originalChatRooms = originalChatRooms;
     this.chatRooms = originalChatRooms;
     this.mListener = mListener;
+    this.groupMessage = new GroupMessage();
   }
 
   @Override
@@ -52,10 +56,9 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
   @Override
   public void onBindViewHolder(ItemGroupViewHolder holder, final int position) {
     final ChatRoom chatRoom = chatRooms.get(position);
-
-    GlideUtils.display(context, chatRoom.avatar, holder.iconChatRoom, chatRoom.name, R.drawable.default_group_avatar);
+    GlideUtils.display(context, chatRoom.avatar, holder.iconChatRoom, R.drawable.default_group_avatar);
     holder.txtName.setText(chatRoom.name);
-    holder.txtStatus.setVisibility(View.GONE);
+    groupMessage.setMessage(chatRoom.roomId, holder.txtMessage, holder.txtDate);
 
     ((View) holder.txtName.getParent()).setOnClickListener(new View.OnClickListener() {
       @Override
@@ -100,7 +103,7 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
     intent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, chatRoom.roomId);
     intent.putExtra(StaticConfig.INTENT_KEY_CHAT_AVATAR, chatRoom.avatar);
     intent.putExtra(StaticConfig.INTENT_KEY_CHAT_IS_GROUP, chatRoom.isGroup);
-    context.startActivity(intent);
+    context.startActivityForResult(intent, ConversationActivity.REQUEST_CODE_CHAT);
   }
 
   @Override
@@ -109,15 +112,17 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
   }
 
   class ItemGroupViewHolder extends RecyclerView.ViewHolder {
-    final ImageView iconChatRoom;
+    final CircleImageView iconChatRoom;
     final TextView txtName;
-    final TextView txtStatus;
+    final TextView txtMessage;
+    final TextView txtDate;
 
     ItemGroupViewHolder(View itemView) {
       super(itemView);
-      iconChatRoom = itemView.findViewById(R.id.img_avatar);
-      txtName = itemView.findViewById(R.id.txtName);
-      txtStatus = itemView.findViewById(R.id.txtStatus);
+      iconChatRoom = (CircleImageView) itemView.findViewById(R.id.img_avatar);
+      txtName = (TextView) itemView.findViewById(R.id.txtName);
+      txtMessage = (TextView) itemView.findViewById(R.id.txtMessage);
+      txtDate = (TextView) itemView.findViewById(R.id.txtDate);
     }
   }
 

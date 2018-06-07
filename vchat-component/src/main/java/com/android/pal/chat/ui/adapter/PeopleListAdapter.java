@@ -8,9 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-
 
 import com.android.pal.chat.R;
 import com.android.pal.chat.model.Group;
@@ -92,10 +90,10 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.It
 
     public ItemFriendHolder(View itemView) {
       super(itemView);
-      txtName = itemView.findViewById(R.id.txtName);
-      txtEmail = itemView.findViewById(R.id.txtEmail);
-      avatar = itemView.findViewById(R.id.icon_avata);
-      checkBox = itemView.findViewById(R.id.checkAddPeople);
+      txtName = (TextView) itemView.findViewById(R.id.txtName);
+      txtEmail = (TextView) itemView.findViewById(R.id.txtEmail);
+      avatar = (ImageView) itemView.findViewById(R.id.icon_avata);
+      checkBox = (CheckBox) itemView.findViewById(R.id.checkAddPeople);
     }
   }
 }

@@ -13,6 +13,7 @@
     <string name="next">NEXT</string>
     <string name="register">REGISTER</string>
     <string name="create_group">Create Group</string>
+    <string name="edit_group_image">Change Image</string>
     <string name="participants">Participants</string>
     <string name="admin">Admin</string>
 

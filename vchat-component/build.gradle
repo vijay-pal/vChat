@@ -2,9 +2,9 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 27
-
+    buildToolsVersion "26.0.2"
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 17
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -20,11 +20,11 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     compile 'com.android.support:recyclerview-v7:27.0.2'
     compile 'com.android.support:percent:27.0.2'
     compile 'com.firebaseui:firebase-ui-storage:0.6.0'
+    compile 'de.hdodenhof:circleimageview:2.2.0'
 
     compile project(':base-module')
 }

@@ -11,8 +11,9 @@ import android.view.View;
  */
 
 public class BaseActivity extends AppCompatActivity {
+
   protected void enableToolbar(@IdRes int resId) {
-    Toolbar toolbar = findViewById(resId);
+    Toolbar toolbar = (Toolbar) findViewById(resId);
     setSupportActionBar(toolbar);
     toolbar.setNavigationOnClickListener(new View.OnClickListener() {
       @Override

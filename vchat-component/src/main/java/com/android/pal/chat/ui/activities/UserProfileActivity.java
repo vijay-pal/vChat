@@ -87,13 +87,13 @@ public class UserProfileActivity extends BaseActivity {
     mAuth = FirebaseAuth.getInstance();
 
     // Inflate the layout for this fragment
-    avatar = findViewById(R.id.img_avatar);
+    avatar = (ImageView) findViewById(R.id.img_avatar);
     avatar.setOnClickListener(onAvatarClick);
 
     setupArrayListInfo(myAccount);
     setImageAvatar(this, myAccount.avatar);
 
-    recyclerView = findViewById(R.id.info_recycler_view);
+    recyclerView = (RecyclerView) findViewById(R.id.info_recycler_view);
     infoAdapter = new UserInfoAdapter(listConfig);
     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
     recyclerView.setLayoutManager(layoutManager);
@@ -105,7 +105,7 @@ public class UserProfileActivity extends BaseActivity {
 
   private void initToolbar() {
     enableToolbar(R.id.toolbar);
-    collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+    collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
     collapsingToolbarLayout.setTitle(myAccount.name);
   }
 
@@ -135,24 +135,24 @@ public class UserProfileActivity extends BaseActivity {
     public void onClick(View view) {
 
       new AlertDialog.Builder(UserProfileActivity.this)
-        .setTitle("Avatar")
-        .setMessage("Are you sure want to change avatar profile?")
-        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialogInterface, int i) {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_PICK);
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-            dialogInterface.dismiss();
-          }
-        })
-        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialogInterface, int i) {
-            dialogInterface.dismiss();
-          }
-        }).show();
+          .setTitle("Avatar")
+          .setMessage("Are you sure want to change avatar profile?")
+          .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+              Intent intent = new Intent();
+              intent.setType("image/*");
+              intent.setAction(Intent.ACTION_PICK);
+              startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+              dialogInterface.dismiss();
+            }
+          })
+          .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+              dialogInterface.dismiss();
+            }
+          }).show();
     }
   };
 
@@ -171,8 +171,8 @@ public class UserProfileActivity extends BaseActivity {
         imgBitmap = ImageUtils.cropToSquare(imgBitmap);
         InputStream is = ImageUtils.convertBitmapToInputStream(imgBitmap);
         final Bitmap liteImage = ImageUtils.makeImageLite(is,
-          imgBitmap.getWidth(), imgBitmap.getHeight(),
-          ImageUtils.AVATAR_WIDTH, ImageUtils.AVATAR_HEIGHT);
+            imgBitmap.getWidth(), imgBitmap.getHeight(),
+            ImageUtils.AVATAR_WIDTH, ImageUtils.AVATAR_HEIGHT);
 
         String imageBase64 = ImageUtils.encodeBase64(liteImage);
         myAccount.avatar = imageBase64;
@@ -182,27 +182,27 @@ public class UserProfileActivity extends BaseActivity {
         waitingDialog.show();
 
         userDB.child("avatar").setValue(imageBase64)
-          .addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-              if (task.isSuccessful()) {
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+              @Override
+              public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
 
-                waitingDialog.dismiss();
-                SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(UserProfileActivity.this);
-                preferenceHelper.saveUserInfo(myAccount);
-                avatar.setImageDrawable(ImageUtils.roundedImage(UserProfileActivity.this, liteImage));
+                  waitingDialog.dismiss();
+                  SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(UserProfileActivity.this);
+                  preferenceHelper.saveUserInfo(myAccount);
+                  avatar.setImageDrawable(ImageUtils.roundedImage(UserProfileActivity.this, liteImage));
 
-                Toast.makeText(UserProfileActivity.this, "Update avatar successfully!", Toast.LENGTH_LONG).show();
+                  Toast.makeText(UserProfileActivity.this, "Update avatar successfully!", Toast.LENGTH_LONG).show();
+                }
               }
-            }
-          })
-          .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-              waitingDialog.dismiss();
-              Toast.makeText(UserProfileActivity.this, "Failed to update avatar", Toast.LENGTH_LONG).show();
-            }
-          });
+            })
+            .addOnFailureListener(new OnFailureListener() {
+              @Override
+              public void onFailure(@NonNull Exception e) {
+                waitingDialog.dismiss();
+                Toast.makeText(UserProfileActivity.this, "Failed to update avatar", Toast.LENGTH_LONG).show();
+              }
+            });
       } catch (FileNotFoundException e) {
         e.printStackTrace();
       }
@@ -217,8 +217,8 @@ public class UserProfileActivity extends BaseActivity {
     Configuration userNameConfig = new Configuration(USERNAME_LABEL, myAccount.name, R.drawable.ic_account_circle_black_24dp);
     listConfig.add(userNameConfig);
 
-    Configuration emailConfig = new Configuration(EMAIL_LABEL, myAccount.email, R.drawable.ic_email_black_24dp);
-    listConfig.add(emailConfig);
+    /*Configuration emailConfig = new Configuration(EMAIL_LABEL, myAccount.email, R.drawable.ic_email_black_24dp);
+    listConfig.add(emailConfig);*/
 
     Configuration resetPass = new Configuration(RESETPASS_LABEL, "", R.drawable.ic_update_black_24dp);
     listConfig.add(resetPass);
@@ -258,7 +258,7 @@ public class UserProfileActivity extends BaseActivity {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
       View itemView = LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.list_info_item_layout, parent, false);
+          .inflate(R.layout.list_info_item_layout, parent, false);
       return new ViewHolder(itemView);
     }
 
@@ -281,47 +281,47 @@ public class UserProfileActivity extends BaseActivity {
 
           if (config.getLabel().equals(USERNAME_LABEL)) {
             View vewInflater = LayoutInflater.from(UserProfileActivity.this)
-              .inflate(R.layout.dialog_edit_username, null);
+                .inflate(R.layout.dialog_edit_username, null);
             final EditText input = (EditText) vewInflater.findViewById(R.id.edit_username);
             input.setText(myAccount.name);
             new AlertDialog.Builder(UserProfileActivity.this)
-              .setTitle("Edit username")
-              .setView(vewInflater)
-              .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                  String newName = input.getText().toString();
-                  if (!myAccount.name.equals(newName)) {
-                    changeUserName(newName);
+                .setTitle("Edit username")
+                .setView(vewInflater)
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                  @Override
+                  public void onClick(DialogInterface dialogInterface, int i) {
+                    String newName = input.getText().toString();
+                    if (!myAccount.name.equals(newName)) {
+                      changeUserName(newName);
+                    }
+                    dialogInterface.dismiss();
                   }
-                  dialogInterface.dismiss();
-                }
-              })
-              .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                  dialogInterface.dismiss();
-                }
-              }).show();
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                  @Override
+                  public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                  }
+                }).show();
           }
 
           if (config.getLabel().equals(RESETPASS_LABEL)) {
             new AlertDialog.Builder(UserProfileActivity.this)
-              .setTitle("Password")
-              .setMessage("Are you sure want to reset password?")
-              .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                  resetPassword(myAccount.email);
-                  dialogInterface.dismiss();
-                }
-              })
-              .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                  dialogInterface.dismiss();
-                }
-              }).show();
+                .setTitle("Password")
+                .setMessage("Are you sure want to reset password?")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                  @Override
+                  public void onClick(DialogInterface dialogInterface, int i) {
+                    resetPassword(myAccount.email);
+                    dialogInterface.dismiss();
+                  }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                  @Override
+                  public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                  }
+                }).show();
           }
         }
       });
@@ -344,18 +344,18 @@ public class UserProfileActivity extends BaseActivity {
 
     void resetPassword(final String email) {
       mAuth.sendPasswordResetEmail(email)
-        .addOnCompleteListener(new OnCompleteListener<Void>() {
-          @Override
-          public void onComplete(@NonNull Task<Void> task) {
-            Toast.makeText(UserProfileActivity.this, "Recovery email sent to " + email, Toast.LENGTH_LONG).show();
-          }
-        })
-        .addOnFailureListener(new OnFailureListener() {
-          @Override
-          public void onFailure(@NonNull Exception e) {
-            Toast.makeText(UserProfileActivity.this, "Failed to sending recovery email sent to " + email, Toast.LENGTH_LONG).show();
-          }
-        });
+          .addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+              Toast.makeText(UserProfileActivity.this, "Recovery email sent to " + email, Toast.LENGTH_LONG).show();
+            }
+          })
+          .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+              Toast.makeText(UserProfileActivity.this, "Failed to sending recovery email sent to " + email, Toast.LENGTH_LONG).show();
+            }
+          });
     }
 
     @Override
@@ -370,9 +370,9 @@ public class UserProfileActivity extends BaseActivity {
 
       public ViewHolder(View view) {
         super(view);
-        label = view.findViewById(R.id.tv_title);
-        value = view.findViewById(R.id.tv_detail);
-        icon = view.findViewById(R.id.img_icon);
+        label = (TextView) view.findViewById(R.id.tv_title);
+        value = (TextView) view.findViewById(R.id.tv_detail);
+        icon = (ImageView) view.findViewById(R.id.img_icon);
       }
     }
 

@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/base-module/base-module.iml" filepath="$PROJECT_DIR$/base-module/base-module.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/vChat.iml" filepath="$PROJECT_DIR$/.idea/vChat.iml" />
       <module fileurl="file://$PROJECT_DIR$/vChat.iml" filepath="$PROJECT_DIR$/vChat.iml" />
       <module fileurl="file://$PROJECT_DIR$/vchat-component/vchat-component.iml" filepath="$PROJECT_DIR$/vchat-component/vchat-component.iml" />
     </modules>

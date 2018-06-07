@@ -9,13 +9,14 @@ import android.widget.MediaController;
 import android.widget.VideoView;
 
 import com.android.pal.chat.R;
+import com.android.pal.chat.base.BaseActivity;
 
 
 /**
  * Created by vijay on 4/1/18.
  */
 
-public class VideoViewActivity extends AppCompatActivity {
+public class VideoViewActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

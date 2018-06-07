@@ -1,54 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:background="@drawable/bt_shape"
-              android:gravity="center"
-              android:orientation="horizontal"
-              android:padding="10dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="55dp">
 
-    <com.android.pal.chat.ui.widgets.CircularImageView
+    <TextView
+        android:id="@+id/txtDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:padding="5dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp"
+        tools:text="Vijay Pal" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_avatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/default_avatar"/>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="10dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/txtName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:maxLines="1"
-            android:text="Vijay Pal"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="14sp"/>
-
-        <TextView
-            android:id="@+id/txtStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:text=""
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="12sp"/>
-    </LinearLayout>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="5dp"
+        android:src="@drawable/default_group_avatar" />
 
     <TextView
-        android:id="@+id/txtMore"
-        android:layout_width="wrap_content"
+        android:id="@+id/txtName"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@id/img_avatar"
+        android:layout_toLeftOf="@id/txtDate"
+        android:layout_toRightOf="@id/img_avatar"
+        android:layout_toStartOf="@id/txtDate"
+        android:maxLines="1"
         android:padding="5dp"
-        android:text="@string/more"
-        android:textColor="@color/colorPrimary"
-        android:textSize="12sp"
-        android:visibility="gone"/>
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        tools:text="Vijay Pal" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/txtMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="7dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@id/img_avatar"
+        android:layout_toRightOf="@id/img_avatar"
+        android:drawablePadding="5dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:padding="2dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="12sp"
+        tools:text="@string/type_your_message" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height=".1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp"
+        android:background="#d1d1d1" />
+</RelativeLayout>

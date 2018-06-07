@@ -21,7 +21,7 @@ import com.android.pal.chat.R;
  * Created by vijay on 18/1/18.
  */
 
-public class CircularImageView extends ImageView {
+public class CircularImageView extends android.support.v7.widget.AppCompatImageView {
   private static final ScaleType SCALE_TYPE = ScaleType.CENTER_CROP;
 
   // Default Values

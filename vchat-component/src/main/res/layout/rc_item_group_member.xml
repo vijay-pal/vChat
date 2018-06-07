@@ -1,23 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bt_shape"
+    android:layout_height="50dp"
     android:gravity="center"
     android:orientation="horizontal"
     android:padding="5dp">
 
-    <com.android.pal.chat.ui.widgets.CircularImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_avatar"
         android:layout_width="35dp"
         android:layout_height="35dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:src="@drawable/default_avatar" />
 
+    <TextView
+        android:id="@+id/txtAdmin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:padding="5dp"
+        android:text="@string/admin"
+        android:textColor="#114739"
+        android:textSize="11sp" />
+
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
-        android:layout_weight="1"
+        android:layout_toEndOf="@id/img_avatar"
+        android:layout_toLeftOf="@id/txtAdmin"
+        android:layout_toRightOf="@id/img_avatar"
+        android:layout_toStartOf="@id/txtAdmin"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
@@ -29,7 +47,8 @@
             android:maxLines="1"
             android:text="Vijay Pal"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="14sp" />
+            android:textColor="@android:color/black"
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/txtStatus"
@@ -38,16 +57,13 @@
             android:maxLines="1"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="12sp" />
+            android:textSize="11sp" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/txtAdmin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="@string/admin"
-        android:textColor="@color/colorPrimary"
-        android:textSize="12sp" />
-
-</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height=".1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp" />
+</RelativeLayout>

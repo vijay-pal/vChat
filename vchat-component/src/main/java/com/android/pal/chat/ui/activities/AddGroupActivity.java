@@ -5,18 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,8 +57,8 @@ public class AddGroupActivity extends BaseActivity {
     listIDChoose = new HashSet<>();
     listIDRemove = new HashSet<>();
     listIDChoose.add(StaticConfig.UID);
-    editTextGroupName = findViewById(R.id.editGroupName);
-    txtGroupIcon = findViewById(R.id.icon_group);
+    editTextGroupName = (EditText) findViewById(R.id.editGroupName);
+    txtGroupIcon = (TextView) findViewById(R.id.icon_group);
 
 
     dialogWait = new ProgressDialog(this);
@@ -98,7 +93,7 @@ public class AddGroupActivity extends BaseActivity {
       isEditGroup = false;
     }
 
-    recyclerListFriend = findViewById(R.id.recycleListFriend);
+    recyclerListFriend = (RecyclerView) findViewById(R.id.recycleListFriend);
     recyclerListFriend.setLayoutManager(linearLayoutManager);
     adapter = new PeopleListAdapter(this, listFriend, listIDChoose, listIDRemove, isEditGroup, groupEdit);
     recyclerListFriend.setAdapter(adapter);
@@ -147,19 +142,19 @@ public class AddGroupActivity extends BaseActivity {
     room.groupInfo.put("name", editTextGroupName.getText().toString());
     room.groupInfo.put("admin", StaticConfig.UID);
     FirebaseDatabase.getInstance().getReference().child("group/" + idGroup).setValue(room)
-      .addOnCompleteListener(new OnCompleteListener<Void>() {
-        @Override
-        public void onComplete(@NonNull Task<Void> task) {
-          addRoomForUser(idGroup, 0);
-        }
-      })
-      .addOnFailureListener(new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-          dialogWait.dismiss();
-          Toast.makeText(AddGroupActivity.this, "Cannot connect database", Toast.LENGTH_LONG).show();
-        }
-      })
+        .addOnCompleteListener(new OnCompleteListener<Void>() {
+          @Override
+          public void onComplete(@NonNull Task<Void> task) {
+            addRoomForUser(idGroup, 0);
+          }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+          @Override
+          public void onFailure(@NonNull Exception e) {
+            dialogWait.dismiss();
+            Toast.makeText(AddGroupActivity.this, "Cannot connect database", Toast.LENGTH_LONG).show();
+          }
+        })
     ;
   }
 
@@ -192,19 +187,19 @@ public class AddGroupActivity extends BaseActivity {
       AddGroupActivity.this.finish();
     } else {
       FirebaseDatabase.getInstance().getReference().child("user/" + listIDRemove.toArray()[userIndex] + "/group/" + roomId).removeValue()
-        .addOnCompleteListener(new OnCompleteListener<Void>() {
-          @Override
-          public void onComplete(@NonNull Task<Void> task) {
-            deleteRoomForUser(roomId, userIndex + 1);
-          }
-        })
-        .addOnFailureListener(new OnFailureListener() {
-          @Override
-          public void onFailure(@NonNull Exception e) {
-            dialogWait.dismiss();
-            Toast.makeText(AddGroupActivity.this, "Cannot connect database", Toast.LENGTH_LONG).show();
-          }
-        });
+          .addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+              deleteRoomForUser(roomId, userIndex + 1);
+            }
+          })
+          .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+              dialogWait.dismiss();
+              Toast.makeText(AddGroupActivity.this, "Cannot connect database", Toast.LENGTH_LONG).show();
+            }
+          });
     }
   }
 

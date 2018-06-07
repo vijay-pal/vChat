@@ -2,6 +2,7 @@ package com.android.pal.chat.service;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.pal.chat.base.StaticConfig;
@@ -13,6 +14,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -25,6 +27,7 @@ import java.util.HashMap;
  */
 
 public class LoginAuth {
+  private final static String TAG = LoginAuth.class.getSimpleName();
   private TaskListener mTaskListener;
   private UserSessionListener mSessionListener;
   private AuthUtils authUtils;
@@ -117,6 +120,22 @@ public class LoginAuth {
       ;
     }
 
+    public void isUseExist(final String email, final String password) {
+      mAuth.fetchProvidersForEmail(email).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+        @Override
+        public void onComplete(@NonNull Task<ProviderQueryResult> task) {
+          if (task.getResult().getProviders().isEmpty()) {
+            Log.i(TAG, "isEmpty");
+            if (mSessionListener != null) {
+              mSessionListener.userNotExits();
+            }
+          } else {
+            signIn(email, password);
+          }
+        }
+      });
+    }
+
     public void signIn(String email, String password) {
       if (mTaskListener != null) {
         mTaskListener.startProgress();
@@ -171,12 +190,16 @@ public class LoginAuth {
           if (mTaskListener != null) {
             mTaskListener.dismissProgress();
           }
-          HashMap hashUser = (HashMap) dataSnapshot.getValue();
-          User userInfo = new User();
-          userInfo.name = (String) hashUser.get("name");
-          userInfo.email = (String) hashUser.get("email");
-          userInfo.avatar = (String) hashUser.get("avatar");
-          SharedPreferenceHelper.getInstance(mContext).saveUserInfo(userInfo);
+          try {
+            HashMap hashUser = (HashMap) dataSnapshot.getValue();
+            User userInfo = new User();
+            userInfo.name = (String) hashUser.get("name");
+            userInfo.email = (String) hashUser.get("email");
+            userInfo.avatar = (String) hashUser.get("avatar");
+            SharedPreferenceHelper.getInstance(mContext).saveUserInfo(userInfo);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
         }
 
         @Override
@@ -192,6 +215,10 @@ public class LoginAuth {
       newUser.name = user.getEmail().substring(0, user.getEmail().indexOf("@"));
       newUser.avatar = StaticConfig.STR_DEFAULT_BASE64;
       FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(newUser);
+    }
+
+    public void loggedOut() {
+      mAuth.signOut();
     }
   }
 
@@ -212,5 +239,7 @@ public class LoginAuth {
     void result(FirebaseUser user);
 
     void sessionExpired();
+
+    void userNotExits();
   }
 }

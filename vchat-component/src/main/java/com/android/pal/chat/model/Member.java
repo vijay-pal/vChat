@@ -8,21 +8,22 @@ import com.android.pal.chat.base.StaticConfig;
  */
 
 public class Member {
-    public String id;
-    public String name;
-    public String groupId;
-    public String email;
-    public String avatar;
+  public String id;
+  public String name = "";
+  public String groupId;
+  public String email;
+  public String avatar;
+  public String mobile;
 
-    @Override
-    public String toString() {
-        if (StaticConfig.UID.equals(id)) {
-            return "You";
-        }
-        return name;
+  @Override
+  public String toString() {
+    if (StaticConfig.UID.equals(id)) {
+      return "You";
     }
+    return name;
+  }
 
-    public boolean isAdmin(String adminId) {
-        return adminId != null && adminId.equals(id);
-    }
+  public boolean isAdmin(String adminId) {
+    return adminId != null && adminId.equals(id);
+  }
 }

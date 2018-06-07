@@ -47,7 +47,6 @@ public class GlideUtils {
       .load(source)
       .placeholder(defaultRes)
       .error(defaultRes)
-      .fitCenter()
       .into(imageView);
   }
 
@@ -97,6 +96,22 @@ public class GlideUtils {
       }
     });
   }
+
+  public static void displayWithFixedWidth(final Context context, String source, final ImageView target,
+                                           int defaultRes, final int maxWidth) {
+    target.setImageResource(defaultRes);
+    Glide.with(context).load(source)
+      .asBitmap().centerCrop().into(new SimpleTarget<Bitmap>() {
+      @Override
+      public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+        int width = resource.getWidth();
+        int height = resource.getHeight();
+        int finalHeight = maxWidth * height / width;
+        target.setImageBitmap(Bitmap.createScaledBitmap(resource, maxWidth, finalHeight, true));
+      }
+    });
+  }
+
 
   public static Drawable createImage(Context context, int width, int height, String name, int defaultRes) {
     if (TextUtils.isEmpty(name)) {

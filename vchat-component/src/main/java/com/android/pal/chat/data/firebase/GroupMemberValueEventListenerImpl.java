@@ -17,35 +17,36 @@ import java.util.List;
 
 public class GroupMemberValueEventListenerImpl implements ValueEventListener {
 
-    private Context context;
-    private String userId;
-    private String roomId;
-    private List<Member> members;
+  private Context context;
+  private String userId;
+  private String roomId;
+  private List<Member> members;
 
-    public GroupMemberValueEventListenerImpl(Context context, String userId, String roomId, List<Member> members) {
-        this.context = context;
-        this.userId = userId;
-        this.roomId = roomId;
-        this.members = members;
+  public GroupMemberValueEventListenerImpl(Context context, String userId, String roomId, List<Member> members) {
+    this.context = context;
+    this.userId = userId;
+    this.roomId = roomId;
+    this.members = members;
+  }
+
+  @Override
+  public void onDataChange(DataSnapshot dataSnapshot) {
+    if (dataSnapshot.getValue() != null) {
+      HashMap hashMap = (HashMap) dataSnapshot.getValue();
+      Member member = new Member();
+      member.groupId = roomId;
+      member.id = userId;
+      member.name = (String) hashMap.get("name");
+      member.email = (String) hashMap.get("email");
+      member.avatar = (String) hashMap.get("avatar");
+      member.mobile = String.valueOf(hashMap.get("mobile"));
+      members.add(member);
+      MemberDB.getInstance(context).addMember(member, roomId);
     }
+  }
 
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        if (dataSnapshot.getValue() != null) {
-            HashMap hashMap = (HashMap) dataSnapshot.getValue();
-            Member member = new Member();
-            member.groupId = roomId;
-            member.id = userId;
-            member.name = (String) hashMap.get("name");
-            member.email = (String) hashMap.get("email");
-            member.avatar = (String) hashMap.get("avatar");
-            members.add(member);
-            MemberDB.getInstance(context).addMember(member, roomId);
-        }
-    }
+  @Override
+  public void onCancelled(DatabaseError databaseError) {
 
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
-
-    }
+  }
 }

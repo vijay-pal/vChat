@@ -11,6 +11,7 @@ import java.util.Locale;
 public class DateUtils {
 
   public static final String FORMAT_hh_mm_a = "hh.mm a";
+  public static final String FORMAT_dd_MM_YY = "dd/MM/yy";
 
   public static String format(long dateTime, String format) {
     SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());

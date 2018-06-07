@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 
 import com.android.pal.chat.BuildConfig;
 import com.android.pal.chat.R;
+import com.android.pal.chat.base.BaseActivity;
 import com.android.pal.chat.base.StaticConfig;
 import com.android.pal.chat.data.ChatRoomDB;
 import com.android.pal.chat.data.firebase.ChatRoomValueInitializer;
@@ -29,9 +29,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements GroupValueEventListenerImpl.GroupRefreshCompletedListener,
-    SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchPeopleValueEvent.SearchPeopleListener,
-    LoginAuth.UserSessionListener {
+public class HomeActivity extends BaseActivity implements GroupValueEventListenerImpl.GroupRefreshCompletedListener,
+  SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchPeopleValueEvent.SearchPeopleListener,
+  LoginAuth.UserSessionListener {
 
   private List<ChatRoom> chatRooms;
   private LoginAuth loginAuth;
@@ -198,5 +198,10 @@ public class HomeActivity extends AppCompatActivity implements GroupValueEventLi
   @Override
   public void sessionExpired() {
     finish();
+  }
+
+  @Override
+  public void userNotExits() {
+
   }
 }

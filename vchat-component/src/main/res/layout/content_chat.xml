@@ -8,7 +8,6 @@
     android:background="@null"
     android:focusableInTouchMode="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.android.chat.activities.ChatActivity"
     tools:showIn="@layout/activity_chat">
 
     <LinearLayout
@@ -23,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:stretchColumns="0,1"
+            android:stretchColumns="0,2"
             android:visibility="gone">
 
             <TableRow
@@ -34,21 +33,28 @@
                     android:id="@+id/btn_camera"
                     android:layout_height="70dp"
                     android:layout_column="0"
-                    android:background="@drawable/bt_shape"
+                    android:background="@color/transparent"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_photo_camera_black_24dp"
-                    android:tint="@color/colorPrimaryDark" />
+                    android:src="@drawable/camera" />
 
                 <ImageButton
                     android:id="@+id/btn_gallery"
                     android:layout_height="70dp"
                     android:layout_column="1"
-                    android:background="@drawable/bt_shape"
+                    android:background="@color/transparent"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_photo_library_black_24dp"
-                    android:tint="@color/colorPrimaryDark" />
+                    android:src="@drawable/gallery" />
+
+                <ImageButton
+                    android:id="@+id/btn_video"
+                    android:layout_height="70dp"
+                    android:layout_column="2"
+                    android:background="@color/transparent"
+                    android:padding="10dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/video_play" />
             </TableRow>
 
             <TableRow
@@ -56,25 +62,24 @@
                 android:visibility="visible">
 
                 <ImageButton
-                    android:id="@+id/btn_video"
-                    android:layout_height="70dp"
-                    android:layout_column="0"
-                    android:background="@drawable/bt_shape"
-                    android:padding="10dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_video_library_black_24dp"
-                    android:tint="@color/colorPrimaryDark" />
-
-                <ImageButton
                     android:id="@+id/btn_location"
                     android:layout_height="70dp"
-                    android:layout_column="1"
-                    android:background="@drawable/bt_shape"
+                    android:layout_column="0"
+                    android:background="@color/transparent"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_location_on_black_24dp"
-                    android:tint="@color/colorPrimaryDark" />
+                    android:src="@drawable/location_v_chat" />
+
+                <ImageButton
+                    android:id="@+id/btn_audio"
+                    android:layout_height="70dp"
+                    android:layout_column="1"
+                    android:background="@color/transparent"
+                    android:padding="10dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/audio" />
             </TableRow>
+
         </TableLayout>
     </LinearLayout>
 
