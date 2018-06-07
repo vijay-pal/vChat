@@ -1,4 +1,4 @@
-package com.android.chat.activities;
+package com.pal.android.vChat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.chat.R;
 import com.android.pal.chat.base.StaticConfig;
 import com.android.pal.chat.service.LoginAuth;
 import com.android.pal.chat.ui.activities.HomeActivity;
@@ -17,8 +16,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.regex.Matcher;
 
-public class LoginActivity extends AppCompatActivity implements LoginAuth.TaskListener {
-  private static String TAG = "LoginActivity";
+public class LoginActivityOld extends AppCompatActivity implements LoginAuth.TaskListener {
+  private static String TAG = "LoginActivityOld";
   private EditText editTextUsername, editTextPassword;
   private ProgressDialog waitingDialog;
 
@@ -33,7 +32,7 @@ public class LoginActivity extends AppCompatActivity implements LoginAuth.TaskLi
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_login);
+    setContentView(R.layout.activity_login_old);
     editTextUsername = findViewById(R.id.et_username);
     editTextPassword = findViewById(R.id.et_password);
 

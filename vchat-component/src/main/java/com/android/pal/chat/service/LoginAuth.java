@@ -2,18 +2,22 @@ package com.android.pal.chat.service;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.android.pal.chat.base.StaticConfig;
 import com.android.pal.chat.base.data.SharedPreferenceHelper;
 import com.android.pal.chat.base.model.User;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -94,29 +98,29 @@ public class LoginAuth {
         mTaskListener.startProgress();
       }
       mAuth.createUserWithEmailAndPassword(email, password)
-          .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-              if (mTaskListener != null) {
-                mTaskListener.dismissProgress();
-              }
-              // signed in user can be handled in the listener.
-              if (!task.isSuccessful()) {
-                Toast.makeText(mContext, "Email exist or weak password!", Toast.LENGTH_LONG).show();
-              } else {
-                initNewUserInfo();
-                mTaskListener.userCreated();
-              }
+        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+          @Override
+          public void onComplete(@NonNull Task<AuthResult> task) {
+            if (mTaskListener != null) {
+              mTaskListener.dismissProgress();
             }
-          })
-          .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-              if (mTaskListener != null) {
-                mTaskListener.dismissProgress();
-              }
+            // signed in user can be handled in the listener.
+            if (!task.isSuccessful()) {
+              Toast.makeText(mContext, "Email exist or weak password!", Toast.LENGTH_LONG).show();
+            } else {
+              initNewUserInfo();
+              mTaskListener.userCreated();
             }
-          })
+          }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+          @Override
+          public void onFailure(@NonNull Exception e) {
+            if (mTaskListener != null) {
+              mTaskListener.dismissProgress();
+            }
+          }
+        })
       ;
     }
 
@@ -141,46 +145,76 @@ public class LoginAuth {
         mTaskListener.startProgress();
       }
       mAuth.signInWithEmailAndPassword(email, password)
-          .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
+        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+          @Override
+          public void onComplete(@NonNull Task<AuthResult> task) {
+            if (mTaskListener != null) {
+              mTaskListener.dismissProgress();
+            }
+            if (!task.isSuccessful()) {
+              Toast.makeText(mContext, "Email not exist or wrong password!", Toast.LENGTH_LONG).show();
+            } else {
+              saveUserInfo();
               if (mTaskListener != null) {
-                mTaskListener.dismissProgress();
-              }
-              if (!task.isSuccessful()) {
-                Toast.makeText(mContext, "Email not exist or wrong password!", Toast.LENGTH_LONG).show();
-              } else {
-                saveUserInfo();
-                if (mTaskListener != null) {
-                  mTaskListener.loginSuccess();
-                }
+                mTaskListener.loginSuccess();
               }
             }
-          })
-          .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-              if (mTaskListener != null) {
-                mTaskListener.dismissProgress();
-              }
+          }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+          @Override
+          public void onFailure(@NonNull Exception e) {
+            if (mTaskListener != null) {
+              mTaskListener.dismissProgress();
             }
-          });
+          }
+        });
+    }
+
+    public void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+      Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+
+      AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+      mAuth.signInWithCredential(credential)
+        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+          @Override
+          public void onComplete(@NonNull Task<AuthResult> task) {
+            if (task.isSuccessful()) {
+              // Sign in success, update UI with the signed-in user's information
+              Log.d(TAG, "signInWithCredential:success");
+              user = mAuth.getCurrentUser();
+              initNewUserInfo();
+              if (mTaskListener != null) {
+                mTaskListener.loginSuccess();
+              }
+//              updateUI(user);
+            } else {
+              // If sign in fails, display a message to the user.
+              Log.w(TAG, "signInWithCredential:failure", task.getException());
+              Toast.makeText(mContext, "Authentication Failed.", Toast.LENGTH_LONG).show();
+//              Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+//              updateUI(null);
+            }
+
+            // ...
+          }
+        });
     }
 
     public void resetPassword(final String email) {
       mAuth.sendPasswordResetEmail(email)
-          .addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-              Toast.makeText(mContext, "Sent email to " + email, Toast.LENGTH_LONG).show();
-            }
-          })
-          .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-              Toast.makeText(mContext, "We can't sent recovery email on  " + email, Toast.LENGTH_LONG).show();
-            }
-          });
+        .addOnCompleteListener(new OnCompleteListener<Void>() {
+          @Override
+          public void onComplete(@NonNull Task<Void> task) {
+            Toast.makeText(mContext, "Sent email to " + email, Toast.LENGTH_LONG).show();
+          }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+          @Override
+          public void onFailure(@NonNull Exception e) {
+            Toast.makeText(mContext, "We can't sent recovery email on  " + email, Toast.LENGTH_LONG).show();
+          }
+        });
     }
 
     public void saveUserInfo() {

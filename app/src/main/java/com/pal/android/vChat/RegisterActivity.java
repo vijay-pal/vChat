@@ -1,4 +1,4 @@
-package com.android.chat.activities;
+package com.pal.android.vChat;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.chat.R;
 import com.android.pal.chat.base.StaticConfig;
 
 import java.util.regex.Matcher;

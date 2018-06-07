@@ -8,12 +8,24 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1019849609990:android:374b4af11ea6d701",
+        "mobilesdk_app_id": "1:1019849609990:android:6299cd3f6e3f66f3",
         "android_client_info": {
-          "package_name": "com.android.chat"
+          "package_name": "com.pal.android.vChat"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1019849609990-8ipu91hrmaocp8mcn1np9ev40omg20bj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pal.android.vChat",
+            "certificate_hash": "43937386478d3a91e471bcdc5d20beb65fc10d74"
+          }
+        },
+        {
+          "client_id": "1019849609990-5lp6g106bt5gu448515uv3koijn420mr.apps.googleusercontent.com",
+          "client_type": 3
+        },
         {
           "client_id": "1019849609990-5lp6g106bt5gu448515uv3koijn420mr.apps.googleusercontent.com",
           "client_type": 3
@@ -29,8 +41,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1019849609990-5lp6g106bt5gu448515uv3koijn420mr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
