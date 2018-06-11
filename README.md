@@ -18,6 +18,7 @@ You can also integrate this project module in your existing project to add chat 
       implementation project(':vchat-component')
       ```
   - Update ```google-services.json``` by your google account
+    > Create a project in google firebase account [Google Firebase](https://console.firebase.google.com/) and the steps and download ```google-services.json``` 
   - Implement below interface in your login class
       ```
       public interface TaskListener {
@@ -54,5 +55,5 @@ You can also integrate this project module in your existing project to add chat 
     
        ```LoginAuth``` class provides two method of login and sigup, manual and other is Google Account.
     
-  - Login on firebase console and enable Authentication Sig-In method.
+  - Login on firebase console and enable Authentication Sign-In method.
     
