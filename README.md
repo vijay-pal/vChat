@@ -32,8 +32,8 @@ You can also integrate this project module in your existing project to add chat 
         void loginSuccess();
       }
       ```
-    - Create and intanace of ```loginAuth = new LoginAuth(this, this);``` your login activity 
-    - Register and remove AuthListener by calling its method from 
+  - Create and intanace of ```loginAuth = new LoginAuth(this, this);``` your login activity 
+  - Register and remove AuthListener by calling its method from 
       ```
       protected void onStart() {
         super.onStart();
@@ -45,7 +45,7 @@ You can also integrate this project module in your existing project to add chat 
         loginAuth.removeAuthStateListener();
       } 
       ```
-     - And Start chat room activity by the 
+  - And Start chat room activity by the 
        ```
        Intent intent = new Intent(this, HomeActivity.class);
        startActivity(intent);
@@ -54,5 +54,5 @@ You can also integrate this project module in your existing project to add chat 
     
        ```LoginAuth``` class provides two method of login and sigup, manual and other is Google Account.
     
-    - Login on firebase console and enable Authentication Sig-In method.
+  - Login on firebase console and enable Authentication Sig-In method.
     
