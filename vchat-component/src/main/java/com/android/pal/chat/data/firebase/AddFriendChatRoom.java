@@ -44,37 +44,41 @@ public class AddFriendChatRoom {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
           if (task.isSuccessful()) {
-            if (isFriendId) {
-              addFriend(friendId, false);
-            } else {
-              FirebaseDatabase.getInstance().getReference().child("friend/" + StaticConfig.UID)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                  @Override
-                  public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.getValue() != null) {
-                      HashMap mapListGroup = (HashMap) dataSnapshot.getValue();
-                      for (Object key : mapListGroup.keySet()) {
-                        if (friendId.equals(mapListGroup.get(key))) {
-                          chatRoom.roomId = (String) key;
-                          if (mListener != null) {
-                            ChatRoomDB.getInstance(context).addChatRoom(chatRoom);
-                            mListener.onAdded(chatRoom);
-                          }
+            //if (isFriendId) {
+            //addFriend(friendId, false);
+            // } else {
+            FirebaseDatabase.getInstance().getReference().child("friend/" + StaticConfig.UID)
+              .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                  if (dataSnapshot.getValue() != null) {
+                    HashMap mapListGroup = (HashMap) dataSnapshot.getValue();
+                    for (Object key : mapListGroup.keySet()) {
+                      if (friendId.equals(mapListGroup.get(key))) {
+                        chatRoom.roomId = (String) key;
+                        if (mListener != null) {
+                          ChatRoomDB.getInstance(context).addChatRoom(chatRoom);
+                          mListener.onAdded(chatRoom);
                         }
                       }
                     }
-                    progressDialog.dismiss();
-                  }
-
-                  @Override
-                  public void onCancelled(DatabaseError databaseError) {
-                    progressDialog.dismiss();
-                    if (mListener != null) {
-                      mListener.onFailed();
+                    if (isFriendId) {
+                      FirebaseDatabase.getInstance().getReference().child("friend/" + friendId)
+                        .child(chatRoom.roomId).setValue(StaticConfig.UID);
                     }
                   }
-                });
-            }
+                  progressDialog.dismiss();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                  progressDialog.dismiss();
+                  if (mListener != null) {
+                    mListener.onFailed();
+                  }
+                }
+              });
+            //}
           } else {
             progressDialog.dismiss();
           }
