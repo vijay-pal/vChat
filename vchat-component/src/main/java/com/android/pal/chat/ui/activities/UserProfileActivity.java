@@ -217,14 +217,14 @@ public class UserProfileActivity extends BaseActivity {
     Configuration userNameConfig = new Configuration(USERNAME_LABEL, myAccount.name, R.drawable.ic_account_circle_black_24dp);
     listConfig.add(userNameConfig);
 
-    /*Configuration emailConfig = new Configuration(EMAIL_LABEL, myAccount.email, R.drawable.ic_email_black_24dp);
-    listConfig.add(emailConfig);*/
+    Configuration emailConfig = new Configuration(EMAIL_LABEL, myAccount.email, R.drawable.ic_email_black_24dp);
+    listConfig.add(emailConfig);
 
     Configuration resetPass = new Configuration(RESETPASS_LABEL, "", R.drawable.ic_update_black_24dp);
     listConfig.add(resetPass);
 
-    Configuration signout = new Configuration(SIGNOUT_LABEL, "", R.drawable.ic_power_settings_new_black_24dp);
-    listConfig.add(signout);
+    Configuration signOut = new Configuration(SIGNOUT_LABEL, "", R.drawable.ic_power_settings_new_black_24dp);
+    listConfig.add(signOut);
   }
 
   private void setImageAvatar(Context context, String imgBase64) {
