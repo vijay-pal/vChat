@@ -241,11 +241,23 @@ public class LoginAuth {
     }
 
     void initNewUserInfo() {
-      User newUser = new User();
-      newUser.email = user.getEmail();
-      newUser.name = user.getEmail().substring(0, user.getEmail().indexOf("@"));
-      newUser.avatar = StaticConfig.STR_DEFAULT_BASE64;
-      FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(newUser);
+      FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+          if (!dataSnapshot.exists()) {
+            User newUser = new User();
+            newUser.email = user.getEmail();
+            newUser.name = user.getEmail().substring(0, user.getEmail().indexOf("@"));
+            newUser.avatar = StaticConfig.STR_DEFAULT_BASE64;
+            FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(newUser);
+          }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+      });
     }
 
     public void loggedOut() {
