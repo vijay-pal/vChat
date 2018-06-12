@@ -4,7 +4,7 @@ package com.android.pal.chat.base;
  * Created by vijay on 18/1/18.
  */
 
-public class VChatSeetings {
+public class VChatSettings {
 
   public static void enableGlobalSearch(boolean b) {
     StaticConfig.IS_ENABLE_GLOBAL_SEARCH = b;

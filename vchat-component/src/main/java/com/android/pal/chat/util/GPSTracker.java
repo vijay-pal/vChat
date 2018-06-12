@@ -154,7 +154,7 @@ public class GPSTracker extends Service implements LocationListener {
 
   /**
    * Function to show settings alert dialog.
-   * On pressing the VChatSeetings button it will launch VChatSeetings Options.
+   * On pressing the VChatSettings button it will launch VChatSettings Options.
    */
   public void showSettingsAlert() {
     AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
@@ -165,8 +165,8 @@ public class GPSTracker extends Service implements LocationListener {
     // Setting Dialog Message
     alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
 
-    // On pressing the VChatSeetings button.
-    alertDialog.setPositiveButton("VChatSeetings", new DialogInterface.OnClickListener() {
+    // On pressing the VChatSettings button.
+    alertDialog.setPositiveButton("VChatSettings", new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int which) {
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         mContext.startActivity(intent);
