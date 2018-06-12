@@ -57,7 +57,7 @@ You can also integrate this project module in your existing project to add chat 
     
   - Login on firebase console and enable Authentication Sign-In method.
     
-# How to customize Chat Room
+## How to customize Chat Room
   There is a static method class ```VChatSettings.java``` in base-module, you can use its methods and remove items like search, create group etc.
   
   ```VChatSettings.enableGlobalSearch(boolean b);
