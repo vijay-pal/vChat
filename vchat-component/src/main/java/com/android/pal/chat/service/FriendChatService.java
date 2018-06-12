@@ -23,7 +23,7 @@ import com.android.pal.chat.data.GroupDB;
 import com.android.pal.chat.model.Friend;
 import com.android.pal.chat.model.Group;
 import com.android.pal.chat.model.ListFriend;
-import com.android.pal.chat.ui.activities.HomeActivity;
+import com.android.pal.chat.ui.activities.ChatRoomsActivity;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -176,7 +176,7 @@ public class FriendChatService extends Service {
   }
 
   public void createNotify(String name, String content, int id, Bitmap icon, boolean isGroup) {
-    Intent activityIntent = new Intent(this, HomeActivity.class);
+    Intent activityIntent = new Intent(this, ChatRoomsActivity.class);
     PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, PendingIntent.FLAG_ONE_SHOT);
     NotificationCompat.Builder notificationBuilder = new
       NotificationCompat.Builder(this)

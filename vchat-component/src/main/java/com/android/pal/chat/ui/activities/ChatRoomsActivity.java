@@ -29,7 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
-public class HomeActivity extends BaseActivity implements GroupValueEventListenerImpl.GroupRefreshCompletedListener,
+public class ChatRoomsActivity extends BaseActivity implements GroupValueEventListenerImpl.GroupRefreshCompletedListener,
   SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchPeopleValueEvent.SearchPeopleListener,
   LoginAuth.UserSessionListener {
 
@@ -70,7 +70,7 @@ public class HomeActivity extends BaseActivity implements GroupValueEventListene
   }
 
   private void initComponent() {
-    chatRooms = ChatRoomDB.getInstance(HomeActivity.this).getChatRooms();
+    chatRooms = ChatRoomDB.getInstance(ChatRoomsActivity.this).getChatRooms();
     mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
     mSwipeRefreshLayout.setOnRefreshListener(this);
     RecyclerView recyclerView = findViewById(R.id.recyclerChat);
@@ -162,7 +162,7 @@ public class HomeActivity extends BaseActivity implements GroupValueEventListene
   public void onRefresh() {
     if (ServiceUtils.isNetworkConnected(this)) {
       mSwipeRefreshLayout.setRefreshing(true);
-      new ChatRoomValueInitializer(HomeActivity.this, HomeActivity.this);
+      new ChatRoomValueInitializer(ChatRoomsActivity.this, ChatRoomsActivity.this);
     }
   }
 
