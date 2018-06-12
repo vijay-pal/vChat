@@ -48,10 +48,10 @@ You can also integrate this project module in your existing project to add chat 
       ```
   - And Start chat room activity by the 
        ```
-       Intent intent = new Intent(this, HomeActivity.class);
+       Intent intent = new Intent(this, ChatRoomsActivity.class);
        startActivity(intent);
        ```
-       ```HomeActivity.java``` is an activity of ```vchat-component``` module 
+       ```ChatRoomsActivity.java``` is an activity of ```vchat-component``` module
     
        ```LoginAuth``` class provides two method of login and sigup, manual and other is Google Account.
     
