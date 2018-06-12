@@ -173,7 +173,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener, 
       actionBar.setDisplayHomeAsUpEnabled(true);
 
       if (roomAvatar != null) {
-        GlideUtils.display(this, roomAvatar, (ImageView) toolbar.findViewById(R.id.room_icon), R.drawable.default_group_avatar);
+        GlideUtils.display(this, roomAvatar, (ImageView) toolbar.findViewById(R.id.room_icon), isGroup ? R.drawable.default_group_avatar : R.drawable.default_avatar);
       }
       actionBar.setDisplayUseLogoEnabled(true);
       ((TextView) toolbar.findViewById(R.id.name)).setText(chatRoom);

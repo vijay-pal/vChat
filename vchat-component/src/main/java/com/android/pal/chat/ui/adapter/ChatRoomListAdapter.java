@@ -56,7 +56,7 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
   @Override
   public void onBindViewHolder(ItemGroupViewHolder holder, final int position) {
     final ChatRoom chatRoom = chatRooms.get(position);
-    GlideUtils.display(context, chatRoom.avatar, holder.iconChatRoom, R.drawable.default_group_avatar);
+    GlideUtils.display(context, chatRoom.avatar, holder.iconChatRoom, chatRoom.isGroup ? R.drawable.default_group_avatar : R.drawable.default_avatar);
     holder.txtName.setText(chatRoom.name);
     groupMessage.setMessage(chatRoom.roomId, holder.txtMessage, holder.txtDate);
 

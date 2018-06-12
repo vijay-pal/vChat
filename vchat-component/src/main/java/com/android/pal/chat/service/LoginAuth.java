@@ -187,13 +187,10 @@ public class LoginAuth {
               if (mTaskListener != null) {
                 mTaskListener.loginSuccess();
               }
-//              updateUI(user);
             } else {
               // If sign in fails, display a message to the user.
               Log.w(TAG, "signInWithCredential:failure", task.getException());
               Toast.makeText(mContext, "Authentication Failed.", Toast.LENGTH_LONG).show();
-//              Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-//              updateUI(null);
             }
 
             // ...
