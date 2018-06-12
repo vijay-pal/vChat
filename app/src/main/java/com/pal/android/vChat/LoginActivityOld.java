@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.android.pal.chat.base.StaticConfig;
 import com.android.pal.chat.service.LoginAuth;
-import com.android.pal.chat.ui.activities.HomeActivity;
+import com.android.pal.chat.ui.activities.ChatRoomsActivity;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.regex.Matcher;
@@ -104,7 +104,7 @@ public class LoginActivityOld extends AppCompatActivity implements LoginAuth.Tas
 
   @Override
   public void result(FirebaseUser user) {
-    Intent intent = new Intent(this, HomeActivity.class);
+    Intent intent = new Intent(this, ChatRoomsActivity.class);
     startActivity(intent);
     finish();
   }

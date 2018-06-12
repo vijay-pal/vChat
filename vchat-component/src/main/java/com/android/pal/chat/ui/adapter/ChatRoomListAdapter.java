@@ -18,7 +18,6 @@ import com.android.pal.chat.data.firebase.GroupMessage;
 import com.android.pal.chat.data.firebase.SearchPeopleValueEvent;
 import com.android.pal.chat.model.ChatRoom;
 import com.android.pal.chat.ui.activities.ChatActivity;
-import com.android.pal.chat.ui.activities.ConversationActivity;
 import com.android.pal.chat.util.GlideUtils;
 
 import java.util.ArrayList;
@@ -103,7 +102,7 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
     intent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, chatRoom.roomId);
     intent.putExtra(StaticConfig.INTENT_KEY_CHAT_AVATAR, chatRoom.avatar);
     intent.putExtra(StaticConfig.INTENT_KEY_CHAT_IS_GROUP, chatRoom.isGroup);
-    context.startActivityForResult(intent, ConversationActivity.REQUEST_CODE_CHAT);
+    context.startActivityForResult(intent, StaticConfig.REQUEST_CODE_CHAT);
   }
 
   @Override

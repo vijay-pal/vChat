@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.android.pal.chat.base.BaseActivity;
 import com.android.pal.chat.service.LoginAuth;
-import com.android.pal.chat.ui.activities.HomeActivity;
+import com.android.pal.chat.ui.activities.ChatRoomsActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -129,7 +129,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
 
   @Override
   public void result(FirebaseUser user) {
-    Intent intent = new Intent(this, HomeActivity.class);
+    Intent intent = new Intent(this, ChatRoomsActivity.class);
     startActivity(intent);
     finish();
   }

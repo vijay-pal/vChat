@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -30,10 +29,10 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
-public class ConversationActivity extends BaseActivity implements GroupValueEventListenerImpl.GroupRefreshCompletedListener,
+public class ChatRoomsActivity extends BaseActivity implements GroupValueEventListenerImpl.GroupRefreshCompletedListener,
   SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchPeopleValueEvent.SearchPeopleListener,
   LoginAuth.UserSessionListener {
-  public static final int REQUEST_CODE_CHAT = 101;
+
   private List<ChatRoom> chatRooms;
   private LoginAuth loginAuth;
 
@@ -43,19 +42,18 @@ public class ConversationActivity extends BaseActivity implements GroupValueEven
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    setContentView(R.layout.activity_conversation);
+    setContentView(R.layout.activity_main);
     initToolBar();
     initComponent();
     initFirebase();
   }
 
   private void initToolBar() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
-      actionBar.setTitle("Chats");
+      actionBar.setTitle("vChat");
       actionBar.setDisplayHomeAsUpEnabled(true);
     }
     toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -72,10 +70,10 @@ public class ConversationActivity extends BaseActivity implements GroupValueEven
   }
 
   private void initComponent() {
-    chatRooms = ChatRoomDB.getInstance(ConversationActivity.this).getChatRooms();
-    mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+    chatRooms = ChatRoomDB.getInstance(ChatRoomsActivity.this).getChatRooms();
+    mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
     mSwipeRefreshLayout.setOnRefreshListener(this);
-    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerChat);
+    RecyclerView recyclerView = findViewById(R.id.recyclerChat);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     mAdapter = new ChatRoomListAdapter(this, chatRooms, this);
     recyclerView.setAdapter(mAdapter);
@@ -164,7 +162,7 @@ public class ConversationActivity extends BaseActivity implements GroupValueEven
   public void onRefresh() {
     if (ServiceUtils.isNetworkConnected(this)) {
       mSwipeRefreshLayout.setRefreshing(true);
-      new ChatRoomValueInitializer(ConversationActivity.this, ConversationActivity.this);
+      new ChatRoomValueInitializer(ChatRoomsActivity.this, ChatRoomsActivity.this);
     }
   }
 
@@ -192,7 +190,9 @@ public class ConversationActivity extends BaseActivity implements GroupValueEven
   @Override
   public void result(FirebaseUser user) {
     StaticConfig.UID = user.getUid();
-    onRefresh();
+    if (chatRooms.isEmpty()) {
+      onRefresh();
+    }
   }
 
   @Override
@@ -203,14 +203,5 @@ public class ConversationActivity extends BaseActivity implements GroupValueEven
   @Override
   public void userNotExits() {
 
-  }
-
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (resultCode != RESULT_OK) return;
-    if (requestCode == REQUEST_CODE_CHAT) {
-      onRefresh();
-    }
-    super.onActivityResult(requestCode, resultCode, data);
   }
 }

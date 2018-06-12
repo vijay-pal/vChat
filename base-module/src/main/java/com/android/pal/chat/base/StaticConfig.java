@@ -28,4 +28,6 @@ public class StaticConfig {
   public static boolean IS_ENABLE_SEARCH_OPTION = true;
   public static boolean IS_ENABLE_ABOUT_OPTION = true;
   public static boolean IS_EMABLE_ONE_ONE_CHAT_ROOM = true;
+
+  public static final int REQUEST_CODE_CHAT = 101;
 }
