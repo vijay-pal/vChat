@@ -2,7 +2,6 @@ package com.android.pal.chat.service;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.Toast;
 
